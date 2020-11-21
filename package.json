@@ -1,11 +1,11 @@
 {
-  "name": "{PROJECT_NAME}",
+  "name": "setup-kitten-action",
   "version": "1.0.0",
-  "description": "This GitHub action installs {PROJECT_TITLE}",
+  "description": "This GitHub action installs Kitten",
   "main": "dist/index.js",
   "repository": {
     "type": "git",
-    "url": "git@github.com:fabasoad/{PROJECT_NAME}.git"
+    "url": "git@github.com:fabasoad/setup-kitten-action.git"
   },
   "scripts": {
     "build": "ncc build -m src/index.ts",
@@ -22,7 +22,7 @@
   ],
   "author": "Yevhen Fabizhevskyi",
   "license": "MIT",
-  "homepage": "https://github.com/fabasoad/{PROJECT_NAME}#readme",
+  "homepage": "https://github.com/fabasoad/setup-kitten-action#readme",
   "dependencies": {
     "@actions/core": "1.2.6",
     "@actions/tool-cache": "1.6.1",

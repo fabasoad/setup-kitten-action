@@ -1,13 +1,13 @@
 ---
-name: 'Setup {PROJECT_TITLE}'
+name: 'Setup Kitten'
 author: Yevhen Fabizhevskyi
-description: 'This action sets up a {PROJECT_TITLE}.'
+description: 'This action sets up a Kitten.'
 branding:
   icon: terminal
   color: gray-dark
 inputs:
   version:
-    description: '{PROJECT_TITLE} version.'
+    description: 'Kitten version.'
     required: true
 runs:
   using: 'node12'

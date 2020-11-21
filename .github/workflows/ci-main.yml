@@ -59,13 +59,13 @@ jobs:
         run: yarn install
       - name: Build
         run: yarn run build
-      - name: Install {PROJECT_TITLE}
+      - name: Install Kitten
         uses: ./
         with:
           version: ${{ matrix.version }}
       - name: Run script (Linux, MacOS)
         if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
-        run: {PROJECT_CLI} ./{PROJECT_SCRIPT_FILE}
+        run: kitten ./hello-world.ktn
       - name: Run script (Windows)
         if: matrix.os == 'windows-latest'
-        run: {PROJECT_CLI}-${{ matrix.version }}.exe ./{PROJECT_SCRIPT_FILE}
+        run: kitten.exe ./hello-world.ktn
