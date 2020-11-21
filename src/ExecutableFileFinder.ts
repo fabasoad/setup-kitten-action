@@ -2,7 +2,6 @@ import glob from 'glob'
 import path from 'path'
 import { Logger } from 'winston'
 import CliExeNameProvider from './CliExeNameProvider'
-import { CLI_NAME } from './consts'
 import LoggerFactory from './LoggerFactory'
 
 export default class ExecutableFileFinder implements IExecutableFileFinder {
@@ -10,15 +9,15 @@ export default class ExecutableFileFinder implements IExecutableFileFinder {
   private provider: ICliExeNameProvider
 
   constructor(
-    version: string,
-    provider: ICliExeNameProvider = new CliExeNameProvider(version)) {
+    cliName: string,
+    provider: ICliExeNameProvider = new CliExeNameProvider(cliName)) {
     this.provider = provider
     this.log = LoggerFactory.create('ExecutableFileFinder')
   }
 
-  find(folderPath: string): string {
+  find(folderPath: string, cliName: string): string {
     const pattern: string =
-      `${folderPath}${path.sep}**${path.sep}${CLI_NAME}*`
+      `${folderPath}${path.sep}**${path.sep}${cliName}*`
     const files: string[] = glob.sync(pattern)
       .filter((f: string) => f.endsWith(this.provider.getExeFileName()))
     if (files.length === 0) {
@@ -28,7 +27,7 @@ export default class ExecutableFileFinder implements IExecutableFileFinder {
       throw new Error('There are more than 1 execution file has been found ' +
         `under ${folderPath} folder using ${pattern} pattern: ${files}`)
     }
-    this.log.info(`${CLI_NAME} path is ${files[0]}`)
+    this.log.info(`${cliName} path is ${files[0]}`)
     return files[0]
   }
 }

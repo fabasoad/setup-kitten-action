@@ -12,7 +12,7 @@
     "lint": "eslint --ext ts src",
     "security:auth": "snyk auth",
     "security:test": "snyk test",
-    "test": "yarn run security:test && jest --config=jest.config.json --coverage",
+    "test": "jest --config=jest.config.json --coverage",
     "snyk-protect": "snyk protect",
     "prepare": "npm run snyk-protect"
   },
