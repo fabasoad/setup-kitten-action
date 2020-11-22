@@ -32,16 +32,17 @@ export default class KittenInstaller implements IInstaller {
     const stackCliName: string = this._stackProvider.getExeFileName()
     const repoDir: string = this._clone(owner, repo)
 
-    this._log.info(`Changing directory to ${repo}...`)
-    execSync(`cd ${repo}`)
-
-    const cmd1: string = `${stackCliName} setup`
-    this._log.info(`Running ${cmd1}`)
+    const cmd1: string = `cd ${repo}`
+    this._log.info(`Running > ${cmd1}`)
     execSync(cmd1)
 
-    const cmd2: string = `${stackCliName} build`
-    this._log.info(`Running ${cmd2}`)
+    const cmd2: string = `${stackCliName} setup`
+    this._log.info(`Running > ${cmd2}`)
     execSync(cmd2)
+
+    const cmd3: string = `${stackCliName} build`
+    this._log.info(`Running > ${cmd3}`)
+    execSync(cmd3)
 
     const execFilePath: string = this._finder.find(repoDir, KITTEN_CLI_NAME)
     this._cache.cache(execFilePath)
