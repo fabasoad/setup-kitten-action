@@ -23,9 +23,10 @@ export default class KittenInstaller implements IInstaller {
   }
 
   public async install(): Promise<void> {
+    const repo: string = 'kitten'
     const stackCliName: string = this._stackProvider.getExeFileName()
-    const repoDir: string = this._checkout('evincarofautumn', 'kitten')
-    execSync(`cd ${repoDir}`)
+    const repoDir: string = this._checkout('evincarofautumn', repo)
+    execSync(`cd ${repo}`)
     execSync(`${stackCliName} setup`)
     execSync(`${stackCliName} build`)
     const execFilePath: string = this._finder.find(repoDir, KITTEN_CLI_NAME)

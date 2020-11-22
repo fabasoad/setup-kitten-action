@@ -17,6 +17,7 @@ describe('KittenInstaller', () => {
   })
 
   it('should install successfully', async () => {
+    const repo: string = 'kitten'
     const repoDir: string = '5zs1kbe5'
     githubCheckoutStub.returns(repoDir)
 
@@ -35,8 +36,8 @@ describe('KittenInstaller', () => {
       { cache: cacheMock })
     await installer.install()
 
-    githubCheckoutStub.calledOnceWithExactly('evincarofautumn', 'kitten')
-    execSyncStub.getCall(0).calledWithExactly(`cd ${repoDir}`)
+    githubCheckoutStub.calledOnceWithExactly('evincarofautumn', repo)
+    execSyncStub.getCall(0).calledWithExactly(`cd ${repo}`)
     execSyncStub.getCall(1).calledWithExactly(`${exeFileName} setup`)
     execSyncStub.getCall(2).calledWithExactly(`${exeFileName} build`)
     expect(findMock.mock.calls.length).toBe(1)
