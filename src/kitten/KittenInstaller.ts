@@ -36,6 +36,7 @@ export default class KittenInstaller implements IInstaller {
     this._log.info(`Running > ${cmd1}`)
     execSync(cmd1)
     execSync('pwd')
+    execSync('ls -la')
 
     const cmd2: string = `${stackCliName} setup`
     this._log.info(`Running > ${cmd2}`)
