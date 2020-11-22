@@ -1,5 +1,6 @@
 import { execSync } from 'child_process'
-import fs from 'fs'
+import os from 'os'
+import path from 'path'
 import { Logger } from 'winston'
 import Cache from '../Cache'
 import CliExeNameProvider from '../CliExeNameProvider'
@@ -9,6 +10,8 @@ import { clone } from '../github'
 import LoggerFactory from '../LoggerFactory'
 
 export default class KittenInstaller implements IInstaller {
+  private INSTALL_DIR: string = path.join(os.homedir(), '.local', 'bin')
+
   private _clone: typeof clone
   private _stackProvider: ICliExeNameProvider
   private _finder: IExecutableFileFinder
@@ -31,19 +34,20 @@ export default class KittenInstaller implements IInstaller {
     const owner: string = 'evincarofautumn'
     const repo: string = 'kitten'
     const stackCliName: string = this._stackProvider.getExeFileName()
-    const repoDir: string = this._clone(owner, repo)
+    const repoDir: string = this._clone(owner, repo, this.INSTALL_DIR)
+    const stackYamlPath: string = path.join(repoDir, 'stack.yaml')
 
-    const cmd1: string = `cd ${repo}`
-    this._log.info(`Running > ${cmd1}`)
-    execSync(cmd1)
-    this._log.info(`Reading from ${__dirname}`)
-    this._log.info(fs.readdirSync(__dirname))
+    // const cmd1: string = `cd ${repo}`
+    // this._log.info(`Running > ${cmd1}`)
+    // execSync(cmd1)
+    // this._log.info(`Reading from ${__dirname}`)
+    // this._log.info(fs.readdirSync(__dirname))
 
-    const cmd2: string = `${stackCliName} setup`
+    const cmd2: string = `${stackCliName} setup --stack-yaml ${stackYamlPath}`
     this._log.info(`Running > ${cmd2}`)
     execSync(cmd2)
 
-    const cmd3: string = `${stackCliName} build`
+    const cmd3: string = `${stackCliName} build --stack-yaml ${stackYamlPath}`
     this._log.info(`Running > ${cmd3}`)
     execSync(cmd3)
 
