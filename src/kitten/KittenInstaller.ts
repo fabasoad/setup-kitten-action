@@ -1,4 +1,5 @@
 import { execSync } from 'child_process'
+import fs from 'fs'
 import { Logger } from 'winston'
 import Cache from '../Cache'
 import CliExeNameProvider from '../CliExeNameProvider'
@@ -35,8 +36,8 @@ export default class KittenInstaller implements IInstaller {
     const cmd1: string = `cd ${repo}`
     this._log.info(`Running > ${cmd1}`)
     execSync(cmd1)
-    execSync('pwd')
-    execSync('ls -la')
+    this._log.info(`Reading from ${__dirname}`)
+    this._log.info(fs.readdirSync(__dirname))
 
     const cmd2: string = `${stackCliName} setup`
     this._log.info(`Running > ${cmd2}`)

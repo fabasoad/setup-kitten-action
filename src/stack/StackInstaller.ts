@@ -11,15 +11,15 @@ import LoggerFactory from '../LoggerFactory'
 
 export default class StackInstaller implements IInstaller {
   private INSTALL_DIR: string = path.join(os.homedir(), '.local', 'bin')
-  private log: Logger = LoggerFactory.create('StackInstaller')
-  private stackProvider: ICliExeNameProvider
-  private cache: ICache
+  private _log: Logger = LoggerFactory.create('StackInstaller')
+  private _stackProvider: ICliExeNameProvider
+  private _cache: ICache
 
   constructor(
     stackProvider: ICliExeNameProvider = new CliExeNameProvider(STACK_CLI_NAME),
     cache: ICache = new Cache('1.0.0', STACK_CLI_NAME)) {
-    this.stackProvider = stackProvider
-    this.cache = cache
+    this._stackProvider = stackProvider
+    this._cache = cache
   }
 
   public async install(): Promise<void> {
@@ -45,14 +45,19 @@ export default class StackInstaller implements IInstaller {
     default:
       throw new Error(`${osPlatform} OS is unsupported`)
     }
-    this.log.info(`Executing command below to install ${STACK_CLI_NAME}...`)
-    this.log.info(dlCommand)
 
+    this._log.info(`Executing command below to install ${STACK_CLI_NAME}...`)
+    this._log.info(dlCommand)
     execSync(dlCommand)
+
     addPath(this.INSTALL_DIR)
     const execFilePath: string =
-      path.join(this.INSTALL_DIR, this.stackProvider.getExeFileName())
-    execSync(`${execFilePath} update`);
-    await this.cache.cache(execFilePath)
+      path.join(this.INSTALL_DIR, this._stackProvider.getExeFileName())
+
+    const cmd1: string = `${execFilePath} update`
+    this._log.info(`Running > ${cmd1}`)
+    execSync(cmd1)
+
+    await this._cache.cache(execFilePath)
   }
 }

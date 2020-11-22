@@ -75,7 +75,7 @@ describe('Main runner', () => {
     })
 
   afterEach(() => {
-    errorMocked.mockReset();
-    getInputMocked.mockReset();
+    errorMocked.mockReset()
+    getInputMocked.mockReset()
   })
 })
