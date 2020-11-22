@@ -1,9 +1,9 @@
-import { error } from '@actions/core'
+import { error, getInput } from '@actions/core'
 import KittenInstaller from './kitten/KittenInstaller'
 import StackInstaller from './stack/StackInstaller'
 
 export const run = async (
-  stackInstaller: IInstaller = new StackInstaller(),
+  stackInstaller: IInstaller,
   kittenInstaller: IInstaller = new KittenInstaller(),
   err: typeof error = error) => {
   try {
@@ -14,4 +14,6 @@ export const run = async (
   }
 }
 
-run()
+const stackInstaller: IInstaller = getInput('has_stack') == 'true' ?
+  { install: (): Promise<void> => Promise.resolve() } : new StackInstaller()
+run(stackInstaller)

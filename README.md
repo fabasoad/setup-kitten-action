@@ -4,6 +4,12 @@
 
 This action sets up a [Kitten](http://kittenlang.org/).
 
+## Inputs
+
+| Name      | Required | Description                                             | Default | Type     |
+|-----------|----------|---------------------------------------------------------|---------|----------|
+| has_stack | No       | Set it to true in case you already have stack installed | false   | boolean  |
+
 ## Example usage
 
 Let's try to run `hello-world.ktn` file with the following content:

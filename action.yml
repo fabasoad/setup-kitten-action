@@ -6,9 +6,10 @@ branding:
   icon: terminal
   color: gray-dark
 inputs:
-  version:
-    description: 'Kitten version.'
-    required: true
+  has_stack:
+    description: 'Set it to true in case you already have stack installed.'
+    required: false
+    default: false
 runs:
   using: 'node12'
   main: 'dist/index.js'
