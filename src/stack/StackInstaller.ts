@@ -9,12 +9,15 @@ import { STACK_CLI_NAME } from '../consts'
 import LoggerFactory from '../LoggerFactory'
 
 export default class StackInstaller implements IInstaller {
-  private VERSION: string = '1.0.0'
   private installDir: string = path.join(os.homedir(), '.local', 'bin')
   private log: Logger = LoggerFactory.create('StackInstaller')
+  private cache: ICache
 
-  public async install(
-    cache: ICache = new Cache(this.VERSION, STACK_CLI_NAME)): Promise<void> {
+  constructor(cache: ICache = new Cache('1.0.0', STACK_CLI_NAME)) {
+    this.cache = cache
+  }
+
+  public async install(): Promise<void> {
     fs.mkdirSync(this.installDir, { recursive: true })
     const osPlatform: string = os.platform()
 
@@ -38,6 +41,6 @@ export default class StackInstaller implements IInstaller {
     execSync(dlCommand)
     addPath(this.installDir)
     const execFilePath: string = path.join(this.installDir, STACK_CLI_NAME)
-    await cache.cache(execFilePath)
+    await this.cache.cache(execFilePath)
   }
 }
