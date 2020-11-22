@@ -43,7 +43,7 @@ jobs:
           debug: true
   functional_tests:
     name: Functional tests
-    timeout-minutes: 5
+    timeout-minutes: 10
     strategy:
       matrix:
         os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
