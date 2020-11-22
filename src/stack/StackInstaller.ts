@@ -41,6 +41,7 @@ export default class StackInstaller implements IInstaller {
     execSync(dlCommand)
     addPath(this.installDir)
     const execFilePath: string = path.join(this.installDir, STACK_CLI_NAME)
+    execSync(`${execFilePath} update`);
     await this.cache.cache(execFilePath)
   }
 }

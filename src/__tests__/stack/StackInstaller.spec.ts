@@ -45,6 +45,7 @@ describe('StackInstaller', () => {
 
   itParam('should install successfully (${value.platform})',
     items, async ({ platform, command }: IFixture) => {
+      const execFilePath: string = path.join(installDir, STACK_CLI_NAME)
       osPlatformStub.returns(platform)
       // eslint-disable-next-line no-unused-vars
       const cacheMock = jest.fn((p: string) => Promise.resolve())
@@ -53,11 +54,11 @@ describe('StackInstaller', () => {
       })
       await installer.install()
       fsMkdirSyncStub.calledOnceWithExactly(installDir, { recursive: true })
-      execSyncStub.calledOnceWithExactly(command)
+      execSyncStub.getCall(0).calledWithExactly(command)
+      execSyncStub.getCall(1).calledWithExactly(`${execFilePath} update`)
       addPathStub.calledOnceWithExactly(installDir)
       expect(cacheMock.mock.calls.length).toBe(1)
-      expect(cacheMock.mock.calls[0][0])
-        .toBe(path.join(installDir, STACK_CLI_NAME))
+      expect(cacheMock.mock.calls[0][0]).toBe(execFilePath)
     })
 
   it('should throw error in case of unsupported OS', async () => {
