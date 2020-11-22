@@ -16,6 +16,15 @@ interface IFixture {
   command: string
 }
 
+const getWindowsCommand = () => {
+  const cmd1: string = `Invoke-WebRequest -OutFile ${installDir}/${STACK_CLI_NAME}.zip -Uri https://get.haskellstack.org/stable/windows-x86_64.zip`
+  // eslint-disable-next-line max-len
+  const cmd2: string = `Expand-Archive ${installDir}/${STACK_CLI_NAME}.zip -DestinationPath ${installDir}`
+  const cmd3: string =
+    `Remove-Item ${installDir}/${STACK_CLI_NAME}.zip`
+  return `PowerShell.exe -Command "${cmd1}; ${cmd2}; ${cmd3}"`
+}
+
 const items: IFixture[] = [{
   platform: 'linux',
   command: 'curl -L https://get.haskellstack.org/stable/linux-x86_64.tar.gz | tar xz --wildcards --strip-components=1 -C ' + installDir + ` \'*/${STACK_CLI_NAME}\'`
@@ -24,7 +33,7 @@ const items: IFixture[] = [{
   command: `curl --insecure -L https://get.haskellstack.org/stable/osx-x86_64.tar.gz | tar xz --strip-components=1 --include \'*/${STACK_CLI_NAME}\' -C ${installDir}`
 }, {
   platform: 'win32',
-  command: `PowerShell.exe -Command "&{Invoke-WebRequest -OutFile ${installDir}\\${STACK_CLI_NAME}.zip https://get.haskellstack.org/stable/windows-x86_64.zip  7z e ${installDir}\\${STACK_CLI_NAME}.zip -o${installDir} ${STACK_CLI_NAME}.exe  Remove-Item ${installDir}\\${STACK_CLI_NAME}.zip}"`
+  command: getWindowsCommand()
 }]
 
 describe('StackInstaller', () => {

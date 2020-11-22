@@ -35,7 +35,12 @@ export default class StackInstaller implements IInstaller {
       dlCommand = `curl --insecure -L https://get.haskellstack.org/stable/osx-x86_64.tar.gz | tar xz --strip-components=1 --include \'*/${STACK_CLI_NAME}\' -C ${this.INSTALL_DIR}`
       break
     case 'win32':
-      dlCommand = `PowerShell.exe -Command "&{Invoke-WebRequest -OutFile ${this.INSTALL_DIR}\\${STACK_CLI_NAME}.zip https://get.haskellstack.org/stable/windows-x86_64.zip zip e ${this.INSTALL_DIR}\\${STACK_CLI_NAME}.zip -o${this.INSTALL_DIR} ${STACK_CLI_NAME}.exe  Remove-Item ${this.INSTALL_DIR}\\${STACK_CLI_NAME}.zip}"`
+      const cmd1: string = `Invoke-WebRequest -OutFile ${this.INSTALL_DIR}/${STACK_CLI_NAME}.zip -Uri https://get.haskellstack.org/stable/windows-x86_64.zip`
+      // eslint-disable-next-line max-len
+      const cmd2: string = `Expand-Archive ${this.INSTALL_DIR}/${STACK_CLI_NAME}.zip -DestinationPath ${this.INSTALL_DIR}`
+      const cmd3: string =
+        `Remove-Item ${this.INSTALL_DIR}/${STACK_CLI_NAME}.zip`
+      dlCommand = `PowerShell.exe -Command "${cmd1}; ${cmd2}; ${cmd3}"`
       break
     default:
       throw new Error(`${osPlatform} OS is unsupported`)
