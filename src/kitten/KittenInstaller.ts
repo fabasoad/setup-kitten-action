@@ -30,8 +30,6 @@ export default class KittenInstaller implements IInstaller {
     const owner: string = 'evincarofautumn'
     const repo: string = 'kitten'
     const stackCliName: string = this._stackProvider.getExeFileName()
-
-    this._log.info(`Cloning ${owner}/${repo}...`)
     const repoDir: string = this._clone(owner, repo)
 
     this._log.info(`Changing directory to ${repo}...`)
