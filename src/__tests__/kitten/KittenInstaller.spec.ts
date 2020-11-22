@@ -7,19 +7,19 @@ import * as github from '../../github'
 import KittenInstaller from '../../kitten/KittenInstaller'
 
 describe('KittenInstaller', () => {
-  let githubCheckoutStub: SinonStub<[owner: string, repo: string], string>
+  let githubCloneStub: SinonStub<[owner: string, repo: string], string>
   let execSyncStub: SinonStub<
     [command: string, options?: ExecSyncOptions], Buffer>
 
   beforeEach(() => {
-    githubCheckoutStub = stub(github, 'checkout')
+    githubCloneStub = stub(github, 'clone')
     execSyncStub = stub(child_process, 'execSync')
   })
 
   it('should install successfully', async () => {
     const repo: string = 'kitten'
     const repoDir: string = '5zs1kbe5'
-    githubCheckoutStub.returns(repoDir)
+    githubCloneStub.returns(repoDir)
 
     const exeFileName: string = '629mkl7f'
     const getExeFileNameMock = jest.fn(() => exeFileName)
@@ -30,13 +30,13 @@ describe('KittenInstaller', () => {
     const cacheMock = jest.fn()
 
     const installer: KittenInstaller = new KittenInstaller(
-      githubCheckoutStub,
+      githubCloneStub,
       { getExeFileName: getExeFileNameMock },
       { find: findMock },
       { cache: cacheMock })
     await installer.install()
 
-    githubCheckoutStub.calledOnceWithExactly('evincarofautumn', repo)
+    githubCloneStub.calledOnceWithExactly('evincarofautumn', repo)
     execSyncStub.getCall(0).calledWithExactly(`cd ${repo}`)
     execSyncStub.getCall(1).calledWithExactly(`${exeFileName} setup`)
     execSyncStub.getCall(2).calledWithExactly(`${exeFileName} build`)
