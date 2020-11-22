@@ -1,3 +1,4 @@
+import { addPath } from '@actions/core'
 import { execSync } from 'child_process'
 import os from 'os'
 import path from 'path'
@@ -37,21 +38,18 @@ export default class KittenInstaller implements IInstaller {
     const repoDir: string = this._clone(owner, repo, this.INSTALL_DIR)
     const stackYamlPath: string = path.join(repoDir, 'stack.yaml')
 
-    // const cmd1: string = `cd ${repo}`
-    // this._log.info(`Running > ${cmd1}`)
-    // execSync(cmd1)
-    // this._log.info(`Reading from ${__dirname}`)
-    // this._log.info(fs.readdirSync(__dirname))
+    const cmd1: string = `${stackCliName} setup --stack-yaml ${stackYamlPath}`
+    this._log.info(`Running > ${cmd1}`)
+    execSync(cmd1)
 
-    const cmd2: string = `${stackCliName} setup --stack-yaml ${stackYamlPath}`
+    const cmd2: string = `${stackCliName} build --stack-yaml ${stackYamlPath}`
     this._log.info(`Running > ${cmd2}`)
     execSync(cmd2)
 
-    const cmd3: string = `${stackCliName} build --stack-yaml ${stackYamlPath}`
-    this._log.info(`Running > ${cmd3}`)
-    execSync(cmd3)
-
-    const execFilePath: string = this._finder.find(repoDir, KITTEN_CLI_NAME)
+    const stackWorkDir: string = path.join(repoDir, '.stack-work', 'install')
+    const execFilePath: string =
+      this._finder.find(stackWorkDir, KITTEN_CLI_NAME)
+    addPath(path.dirname(execFilePath))
     this._cache.cache(execFilePath)
   }
 }
