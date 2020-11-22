@@ -35,6 +35,7 @@ export default class KittenInstaller implements IInstaller {
     const cmd1: string = `cd ${repo}`
     this._log.info(`Running > ${cmd1}`)
     execSync(cmd1)
+    execSync('pwd')
 
     const cmd2: string = `${stackCliName} setup`
     this._log.info(`Running > ${cmd2}`)
