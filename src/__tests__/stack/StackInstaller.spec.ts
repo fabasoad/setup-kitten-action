@@ -45,13 +45,16 @@ describe('StackInstaller', () => {
 
   itParam('should install successfully (${value.platform})',
     items, async ({ platform, command }: IFixture) => {
-      const execFilePath: string = path.join(installDir, STACK_CLI_NAME)
+      const exeFileName: string = 'RAZ1Hpk4'
+      const execFilePath: string = path.join(installDir, exeFileName)
       osPlatformStub.returns(platform)
+      const getExeFileNameMock = jest.fn(() => exeFileName)
       // eslint-disable-next-line no-unused-vars
       const cacheMock = jest.fn((p: string) => Promise.resolve())
-      const installer: StackInstaller = new StackInstaller({
-        cache: cacheMock
-      })
+      const installer: StackInstaller = new StackInstaller(
+        { getExeFileName: getExeFileNameMock },
+        { cache: cacheMock }
+      )
       await installer.install()
       fsMkdirSyncStub.calledOnceWithExactly(installDir, { recursive: true })
       execSyncStub.getCall(0).calledWithExactly(command)
@@ -63,11 +66,13 @@ describe('StackInstaller', () => {
 
   it('should throw error in case of unsupported OS', async () => {
     osPlatformStub.returns('1pR71dal')
+    const getExeFileNameMock = jest.fn(() => 'o71xzjDK')
     // eslint-disable-next-line no-unused-vars
     const cacheMock = jest.fn((p: string) => Promise.resolve())
-    const installer: StackInstaller = new StackInstaller({
-      cache: cacheMock
-    })
+    const installer: StackInstaller = new StackInstaller(
+      { getExeFileName: getExeFileNameMock },
+      { cache: cacheMock }
+    )
     let flag: boolean = false
     try {
       await installer.install()
@@ -78,6 +83,7 @@ describe('StackInstaller', () => {
     fsMkdirSyncStub.calledOnceWithExactly(installDir, { recursive: true })
     expect(execSyncStub.notCalled).toBeTruthy()
     expect(addPathStub.notCalled).toBeTruthy()
+    expect(getExeFileNameMock.mock.calls.length).toBe(0)
     expect(cacheMock.mock.calls.length).toBe(0)
   })
 
