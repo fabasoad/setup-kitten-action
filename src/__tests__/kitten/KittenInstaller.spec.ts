@@ -7,7 +7,8 @@ import * as github from '../../github'
 import KittenInstaller from '../../kitten/KittenInstaller'
 
 describe('KittenInstaller', () => {
-  let githubCloneStub: SinonStub<[owner: string, repo: string], string>
+  let githubCloneStub: SinonStub<
+    [owner: string, repo: string, to?: string], string>
   let execSyncStub: SinonStub<
     [command: string, options?: ExecSyncOptions], Buffer>
 
