@@ -6,8 +6,8 @@ import itParam from 'mocha-param'
 import os from 'os'
 import path from 'path'
 import { restore, SinonStub, stub } from 'sinon'
-import { STACK_CLI_NAME } from '../../consts'
-import StackInstaller from '../../stack/StackInstaller'
+import { STACK_CLI_NAME } from '../consts'
+import StackInstaller from '../StackInstaller'
 
 const installDir: string = path.join(os.homedir(), '.local', 'bin')
 

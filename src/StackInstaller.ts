@@ -4,10 +4,10 @@ import fs from 'fs'
 import os from 'os'
 import path from 'path'
 import { Logger } from 'winston'
-import Cache from '../Cache'
-import CliExeNameProvider from '../CliExeNameProvider'
-import { STACK_CLI_NAME } from '../consts'
-import LoggerFactory from '../LoggerFactory'
+import Cache from './Cache'
+import CliExeNameProvider from './CliExeNameProvider'
+import { STACK_CLI_NAME } from './consts'
+import LoggerFactory from './LoggerFactory'
 
 export default class StackInstaller implements IInstaller {
   private INSTALL_DIR: string = path.join(os.homedir(), '.local', 'bin')
@@ -35,11 +35,12 @@ export default class StackInstaller implements IInstaller {
       dlCommand = `curl --insecure -L https://get.haskellstack.org/stable/osx-x86_64.tar.gz | tar xz --strip-components=1 --include \'*/${STACK_CLI_NAME}\' -C ${this.INSTALL_DIR}`
       break
     case 'win32':
-      const cmd1: string = `Invoke-WebRequest -OutFile ${this.INSTALL_DIR}/${STACK_CLI_NAME}.zip -Uri https://get.haskellstack.org/stable/windows-x86_64.zip`
+      const zipPath: string =
+        path.join(this.INSTALL_DIR, `${STACK_CLI_NAME}.zip`)
+      const cmd1: string = `Invoke-WebRequest -OutFile ${zipPath} -Uri https://get.haskellstack.org/stable/windows-x86_64.zip`
       // eslint-disable-next-line max-len
-      const cmd2: string = `Expand-Archive ${this.INSTALL_DIR}/${STACK_CLI_NAME}.zip -DestinationPath ${this.INSTALL_DIR}`
-      const cmd3: string =
-        `Remove-Item ${this.INSTALL_DIR}/${STACK_CLI_NAME}.zip`
+      const cmd2: string = `Expand-Archive ${zipPath} -DestinationPath ${this.INSTALL_DIR}`
+      const cmd3: string = `Remove-Item ${zipPath}`
       dlCommand = `PowerShell.exe -Command "${cmd1}; ${cmd2}; ${cmd3}"`
       break
     default:

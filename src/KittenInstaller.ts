@@ -3,12 +3,12 @@ import { execSync } from 'child_process'
 import os from 'os'
 import path from 'path'
 import { Logger } from 'winston'
-import Cache from '../Cache'
-import CliExeNameProvider from '../CliExeNameProvider'
-import { KITTEN_CLI_NAME, STACK_CLI_NAME } from '../consts'
-import ExecutableFileFinder from '../ExecutableFileFinder'
-import { clone } from '../github'
-import LoggerFactory from '../LoggerFactory'
+import Cache from './Cache'
+import CliExeNameProvider from './CliExeNameProvider'
+import { KITTEN_CLI_NAME, STACK_CLI_NAME } from './consts'
+import ExecutableFileFinder from './ExecutableFileFinder'
+import { clone } from './github'
+import LoggerFactory from './LoggerFactory'
 
 export default class KittenInstaller implements IInstaller {
   private INSTALL_DIR: string = path.join(os.homedir(), '.local', 'bin')
