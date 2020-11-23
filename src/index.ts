@@ -1,18 +1,14 @@
-import { error, getInput } from '@actions/core';
-import Installer from './Installer';
-
-export interface IInstallerFactory {
-  // eslint-disable-next-line no-unused-vars
-  get(v: string): IInstaller
-}
+import { error } from '@actions/core'
+import KittenInstaller from './KittenInstaller'
+import StackInstaller from './StackInstaller'
 
 export const run = async (
-  factory: IInstallerFactory = { get: (v: string) => new Installer(v) },
-  gi: typeof getInput = getInput,
+  stackInstaller: IInstaller = new StackInstaller(),
+  kittenInstaller: IInstaller = new KittenInstaller(),
   err: typeof error = error) => {
-  const installer = factory.get(gi('version'));
   try {
-    await installer.install();
+    await stackInstaller.install()
+    await kittenInstaller.install()
   } catch (e) {
     err((<Error>e).message)
   }

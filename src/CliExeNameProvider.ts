@@ -1,19 +1,16 @@
 import os from 'os'
-import { CLI_NAME } from './consts'
 
 export default class CliExeNameProvider implements ICliExeNameProvider {
-  private version: string
-
-  constructor(version: string) {
-    this.version = version
+  private cliName: string
+  constructor(cliName: string) {
+    this.cliName = cliName
   }
-
   getExeFileName(): string {
-    switch (os.type()) {
-    case 'Windows_NT':
-      return `${CLI_NAME}-${this.version}.exe`
+    switch (os.platform()) {
+    case 'win32':
+      return `${this.cliName}.exe`
     default:
-      return CLI_NAME
+      return this.cliName
     }
   }
 }

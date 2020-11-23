@@ -2,38 +2,41 @@ import itParam from 'mocha-param'
 import os from 'os'
 import { restore, SinonStub, stub } from 'sinon'
 import CliExeNameProvider from '../CliExeNameProvider'
-import { CLI_NAME } from '../consts'
 
 interface IFixture {
-  os: string
-  execFileName: string
+  platform: string
+  actual: string
+  expected: string
 }
 
 describe('CliExeNameProvider', () => {
-  let osTypeStub: SinonStub<[], string>
+  let osPlatformStub: SinonStub<[], string>
 
-  const expectedVersion: string = 'ey1r6c00'
   const items: IFixture[] = [{
-    os: 'Windows_NT',
-    execFileName: `${CLI_NAME}-${expectedVersion}.exe`
+    platform: 'win32',
+    actual: 'n4LSZ7i0',
+    expected: 'n4LSZ7i0.exe'
   }, {
-    os: 'Darwin',
-    execFileName: CLI_NAME
+    platform: 'darwin',
+    actual: 'zVGXb2M1',
+    expected: 'zVGXb2M1'
   }, {
-    os: 'Linux',
-    execFileName: CLI_NAME
+    platform: 'linux',
+    actual: '08drSDMo',
+    expected: '08drSDMo'
   }]
 
   beforeEach(() => {
-    osTypeStub = stub(os, 'type')
+    osPlatformStub = stub(os, 'platform')
   })
 
-  itParam('should return exe name successfully', items, (item: IFixture) => {
-    osTypeStub.returns(item.os)
-    const provider: CliExeNameProvider = new CliExeNameProvider(expectedVersion)
-    const actual: string = provider.getExeFileName()
-    expect(actual).toBe(item.execFileName)
-  })
+  itParam('should return exe name successfully (${value.platform})',
+    items, (item: IFixture) => {
+      osPlatformStub.returns(item.platform)
+      const provider: CliExeNameProvider = new CliExeNameProvider(item.actual)
+      const actual: string = provider.getExeFileName()
+      expect(actual).toBe(item.expected)
+    })
 
   afterEach(() => restore())
 })

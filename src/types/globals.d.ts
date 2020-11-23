@@ -3,24 +3,8 @@ interface IInstaller {
   install(): Promise<void>
 }
 
-interface ICliFileNameBuilder {
-  build(): string
-}
-
-interface IUrlProvider {
-  getUrl(): string
-}
-
-interface IDownloader {
-  download(url: string): Promise<string>
-}
-
-interface IUnzipper {
-  unzip(zipPath: string): Promise<string>
-}
-
 interface IExecutableFileFinder {
-  find(folderPath: string): string
+  find(folderPath: string, cliName: string): string
 }
 
 interface ICache {
