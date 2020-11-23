@@ -55,7 +55,8 @@ jobs:
     strategy:
       matrix:
         os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
-        has_stack: [true, false]
+        install_stack: [true, false]
+        install_kitten: [true, false]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2.3.4
@@ -71,12 +72,13 @@ jobs:
       - name: Build
         run: yarn run build
       - name: Setup Stack
-        if: matrix.has_stack
+        if: ${{ matrix.install_stack }}
         uses: mstksg/setup-stack@v2
       - name: Setup Kitten
+        if: ${{ matrix.install_kitten }}
         uses: ./
-        with:
-          has_stack: ${{ matrix.has_stack }}
+      - name: "Setup Kitten (skipped: ${{ matrix.install_kitten }})"
+        uses: ./
       - name: Run script (Linux, MacOS)
         if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
         run: kitten ./hello-world.ktn

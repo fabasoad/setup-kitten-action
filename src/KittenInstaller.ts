@@ -8,9 +8,10 @@ import CliExeNameProvider from './CliExeNameProvider'
 import { KITTEN_CLI_NAME, STACK_CLI_NAME } from './consts'
 import ExecutableFileFinder from './ExecutableFileFinder'
 import { clone } from './github'
+import InstallerBase from './InstallerBase'
 import LoggerFactory from './LoggerFactory'
 
-export default class KittenInstaller implements IInstaller {
+export default class KittenInstaller extends InstallerBase {
   private INSTALL_DIR: string = path.join(os.homedir(), '.local', 'bin')
 
   private _clone: typeof clone
@@ -22,8 +23,11 @@ export default class KittenInstaller implements IInstaller {
   constructor(
     co: typeof clone = clone,
     stackProvider: ICliExeNameProvider = new CliExeNameProvider(STACK_CLI_NAME),
+    kittenProvider: ICliExeNameProvider =
+    new CliExeNameProvider(KITTEN_CLI_NAME),
     finder: IExecutableFileFinder = new ExecutableFileFinder(KITTEN_CLI_NAME),
     cache: ICache = new Cache('1.0.0', KITTEN_CLI_NAME)) {
+    super(kittenProvider)
     this._clone = co
     this._stackProvider = stackProvider
     this._finder = finder
@@ -31,7 +35,7 @@ export default class KittenInstaller implements IInstaller {
     this._log = LoggerFactory.create('KittenInstaller')
   }
 
-  public async install(): Promise<void> {
+  protected async installInternal(): Promise<void> {
     const owner: string = 'evincarofautumn'
     const repo: string = 'kitten'
     const stackCliName: string = this._stackProvider.getExeFileName()

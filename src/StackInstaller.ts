@@ -7,9 +7,10 @@ import { Logger } from 'winston'
 import Cache from './Cache'
 import CliExeNameProvider from './CliExeNameProvider'
 import { STACK_CLI_NAME } from './consts'
+import InstallerBase from './InstallerBase'
 import LoggerFactory from './LoggerFactory'
 
-export default class StackInstaller implements IInstaller {
+export default class StackInstaller extends InstallerBase {
   private INSTALL_DIR: string = path.join(os.homedir(), '.local', 'bin')
   private _log: Logger = LoggerFactory.create('StackInstaller')
   private _stackProvider: ICliExeNameProvider
@@ -18,11 +19,12 @@ export default class StackInstaller implements IInstaller {
   constructor(
     stackProvider: ICliExeNameProvider = new CliExeNameProvider(STACK_CLI_NAME),
     cache: ICache = new Cache('1.0.0', STACK_CLI_NAME)) {
+    super(stackProvider)
     this._stackProvider = stackProvider
     this._cache = cache
   }
 
-  public async install(): Promise<void> {
+  protected async installInternal(): Promise<void> {
     fs.mkdirSync(this.INSTALL_DIR, { recursive: true })
     const osPlatform: string = os.platform()
 

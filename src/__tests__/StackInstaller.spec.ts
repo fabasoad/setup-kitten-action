@@ -1,6 +1,7 @@
 import * as core from '@actions/core'
 // eslint-disable-next-line camelcase
 import child_process, { ExecSyncOptions } from 'child_process'
+import commandExists from 'command-exists'
 import fs from 'fs'
 import itParam from 'mocha-param'
 import os from 'os'
@@ -44,20 +45,23 @@ describe('StackInstaller', () => {
   let execSyncStub: SinonStub<
     [command: string, options?: ExecSyncOptions], Buffer>
   let addPathStub: SinonStub<[inputPath: string], void>
+  let commandExistsStub: SinonStub<[commandName: string], boolean>
 
   beforeEach(() => {
     fsMkdirSyncStub = stub(fs, 'mkdirSync')
     osPlatformStub = stub(os, 'platform')
     execSyncStub = stub(child_process, 'execSync')
     addPathStub = stub(core, 'addPath')
+    commandExistsStub = stub(commandExists, 'sync')
   })
 
   itParam('should install successfully (${value.platform})',
     items, async ({ platform, command }: IFixture) => {
-      const exeFileName: string = 'RAZ1Hpk4'
-      const execFilePath: string = path.join(installDir, exeFileName)
+      const stackExeFileName: string = 'RAZ1Hpk4'
+      const execFilePath: string = path.join(installDir, stackExeFileName)
+      commandExistsStub.returns(false)
       osPlatformStub.returns(platform)
-      const getExeFileNameMock = jest.fn(() => exeFileName)
+      const getExeFileNameMock = jest.fn(() => stackExeFileName)
       // eslint-disable-next-line no-unused-vars
       const cacheMock = jest.fn((p: string) => Promise.resolve())
       const installer: StackInstaller = new StackInstaller(
@@ -65,17 +69,40 @@ describe('StackInstaller', () => {
         { cache: cacheMock }
       )
       await installer.install()
+      commandExistsStub.calledOnceWithExactly(stackExeFileName)
       fsMkdirSyncStub.calledOnceWithExactly(installDir, { recursive: true })
       execSyncStub.getCall(0).calledWithExactly(command)
       execSyncStub.getCall(1).calledWithExactly(`${execFilePath} update`)
       addPathStub.calledOnceWithExactly(installDir)
+      expect(getExeFileNameMock.mock.calls.length).toBe(2)
       expect(cacheMock.mock.calls.length).toBe(1)
       expect(cacheMock.mock.calls[0][0]).toBe(execFilePath)
     })
 
+  it('should not install', async () => {
+    const stackExeFileName: string = 'RAZ1Hpk4'
+    commandExistsStub.returns(true)
+    const getExeFileNameMock = jest.fn(() => stackExeFileName)
+    // eslint-disable-next-line no-unused-vars
+    const cacheMock = jest.fn((p: string) => Promise.resolve())
+    const installer: StackInstaller = new StackInstaller(
+      { getExeFileName: getExeFileNameMock },
+      { cache: cacheMock }
+    )
+    await installer.install()
+    commandExistsStub.calledOnceWithExactly(stackExeFileName)
+    expect(fsMkdirSyncStub.called).toBeFalsy()
+    expect(execSyncStub.called).toBeFalsy()
+    expect(addPathStub.called).toBeFalsy()
+    expect(getExeFileNameMock.mock.calls.length).toBe(1)
+    expect(cacheMock.mock.calls.length).toBe(0)
+  })
+
   it('should throw error in case of unsupported OS', async () => {
+    commandExistsStub.returns(false)
     osPlatformStub.returns('1pR71dal')
-    const getExeFileNameMock = jest.fn(() => 'o71xzjDK')
+    const stackExeFileName: string = 'o71xzjDK'
+    const getExeFileNameMock = jest.fn(() => stackExeFileName)
     // eslint-disable-next-line no-unused-vars
     const cacheMock = jest.fn((p: string) => Promise.resolve())
     const installer: StackInstaller = new StackInstaller(
@@ -89,10 +116,11 @@ describe('StackInstaller', () => {
       flag = true
     }
     expect(flag).toBeTruthy()
+    commandExistsStub.calledOnceWithExactly(stackExeFileName)
     fsMkdirSyncStub.calledOnceWithExactly(installDir, { recursive: true })
     expect(execSyncStub.notCalled).toBeTruthy()
     expect(addPathStub.notCalled).toBeTruthy()
-    expect(getExeFileNameMock.mock.calls.length).toBe(0)
+    expect(getExeFileNameMock.mock.calls.length).toBe(1)
     expect(cacheMock.mock.calls.length).toBe(0)
   })
 
