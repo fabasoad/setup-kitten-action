@@ -69,11 +69,12 @@ describe('StackInstaller', () => {
         { cache: cacheMock }
       )
       await installer.install()
-      commandExistsStub.calledOnceWithExactly(stackExeFileName)
-      fsMkdirSyncStub.calledOnceWithExactly(installDir, { recursive: true })
-      execSyncStub.getCall(0).calledWithExactly(command)
-      execSyncStub.getCall(1).calledWithExactly(`${execFilePath} update`)
-      addPathStub.calledOnceWithExactly(installDir)
+      expect(commandExistsStub.withArgs(stackExeFileName).callCount).toBe(1)
+      expect(fsMkdirSyncStub
+        .withArgs(installDir, { recursive: true }).callCount).toBe(1)
+      expect(execSyncStub.withArgs(command).callCount).toBe(1)
+      expect(execSyncStub.withArgs(`${execFilePath} update`).callCount).toBe(1)
+      expect(addPathStub.withArgs(installDir).callCount).toBe(1)
       expect(getExeFileNameMock.mock.calls.length).toBe(2)
       expect(cacheMock.mock.calls.length).toBe(1)
       expect(cacheMock.mock.calls[0][0]).toBe(execFilePath)
@@ -90,7 +91,7 @@ describe('StackInstaller', () => {
       { cache: cacheMock }
     )
     await installer.install()
-    commandExistsStub.calledOnceWithExactly(stackExeFileName)
+    expect(commandExistsStub.withArgs(stackExeFileName).callCount).toBe(1)
     expect(fsMkdirSyncStub.called).toBeFalsy()
     expect(execSyncStub.called).toBeFalsy()
     expect(addPathStub.called).toBeFalsy()
@@ -116,8 +117,9 @@ describe('StackInstaller', () => {
       flag = true
     }
     expect(flag).toBeTruthy()
-    commandExistsStub.calledOnceWithExactly(stackExeFileName)
-    fsMkdirSyncStub.calledOnceWithExactly(installDir, { recursive: true })
+    expect(commandExistsStub.withArgs(stackExeFileName).callCount).toBe(1)
+    expect(fsMkdirSyncStub.withArgs(installDir, { recursive: true }).callCount)
+      .toBe(1)
     expect(execSyncStub.notCalled).toBeTruthy()
     expect(addPathStub.notCalled).toBeTruthy()
     expect(getExeFileNameMock.mock.calls.length).toBe(1)

@@ -39,7 +39,6 @@ describe('KittenInstaller', () => {
     const cacheMock = jest.fn()
 
     const installer: KittenInstaller = new KittenInstaller(
-      githubCloneStub,
       { getExeFileName: getStackExeFileNameMock },
       { getExeFileName: getKittenExeFileNameMock },
       { find: findMock },
@@ -47,13 +46,15 @@ describe('KittenInstaller', () => {
     expect(getKittenExeFileNameMock.mock.calls.length).toBe(1)
     await installer.install()
 
-    commandExistsStub.calledOnceWithExactly(kittenExeFileName)
+    expect(commandExistsStub.withArgs(kittenExeFileName).callCount).toBe(1)
     expect(getStackExeFileNameMock.mock.calls.length).toBe(1)
-    githubCloneStub.calledOnceWithExactly('evincarofautumn', repo)
-    execSyncStub.getCall(0).calledWithExactly(
-      `${stackExeFileName} setup --stack-yaml ${stackYamlPath}`)
-    execSyncStub.getCall(1).calledWithExactly(
-      `${stackExeFileName} build --stack-yaml ${stackYamlPath}`)
+    expect(githubCloneStub.withArgs('evincarofautumn', repo).callCount).toBe(1)
+    expect(execSyncStub.withArgs(
+      `${stackExeFileName} setup --stack-yaml ${stackYamlPath}`).callCount)
+      .toBe(1)
+    expect(execSyncStub.withArgs(
+      `${stackExeFileName} build --stack-yaml ${stackYamlPath}`).callCount)
+      .toBe(1)
     expect(findMock.mock.calls.length).toBe(1)
     expect(findMock.mock.calls[0][0])
       .toBe(path.join(repoDir, '.stack-work', 'install'))
@@ -73,7 +74,6 @@ describe('KittenInstaller', () => {
     const cacheMock = jest.fn()
 
     const installer: KittenInstaller = new KittenInstaller(
-      githubCloneStub,
       { getExeFileName: getStackExeFileNameMock },
       { getExeFileName: getKittenExeFileNameMock },
       { find: findMock },
@@ -81,7 +81,7 @@ describe('KittenInstaller', () => {
     expect(getKittenExeFileNameMock.mock.calls.length).toBe(1)
     await installer.install()
 
-    commandExistsStub.calledOnceWithExactly(kittenExeFileName)
+    expect(commandExistsStub.withArgs(kittenExeFileName).callCount).toBe(1)
     expect(getStackExeFileNameMock.mock.calls.length).toBe(0)
     expect(githubCloneStub.called).toBeFalsy()
     expect(execSyncStub.called).toBeFalsy()
