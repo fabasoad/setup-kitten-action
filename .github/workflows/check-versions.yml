@@ -1,0 +1,62 @@
+---
+name: Check versions
+
+on:
+  schedule:
+    - cron: '0 0 * * 1'
+  push:
+    branches:
+      - 'test/**'
+
+env:
+  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+
+jobs:
+  check_versions:
+    name: Check versions
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: Cache node_modules
+        id: yarn-cache
+        uses: actions/cache@v2.1.3
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: Validate versions
+        run: |
+          yarn outdated
+          yarn upgrade --latest
+      - name: Compile
+        if: ${{ steps.yarn-cache.outputs.cache-hit != 'true' }}
+        run: yarn install
+      - name: Check local changes
+        id: local-changes
+        run: echo '::set-output name=has::$(git diff-index --quiet HEAD)'
+      - name: Print
+        run: echo 'Has: ${{ steps.local-changes.outputs.has }}'
+      - name: Increase version
+        if: ${{ steps.local-changes.outputs.has }}
+        run: yarn version --patch
+      - name: Push changes
+        if: ${{ steps.local-changes.outputs.has }}
+        uses: EndBug/add-and-commit@v5.2.0
+        with:
+          branch: bump/${{ hashFiles('**/yarn.lock') }}
+          message: 'Bump dependencies'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create PR
+        if: ${{ steps.local-changes.outputs.has }}
+        uses: peter-evans/create-pull-request@v3.5.1
+        with:
+          branch: bump/${{ hashFiles('**/yarn.lock') }}
+          delete-branch: true
+          base: ${{ github.base_ref }}
+          title: 'Bump dependencies'
+          body: 'Bump dependencies'
+          labels: dependencies
+          reviewers: fabasoad
