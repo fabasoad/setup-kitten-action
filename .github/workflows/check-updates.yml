@@ -26,7 +26,7 @@ jobs:
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
-      - name: Print outdated versions
+      - name: Print outdated dependencies
         run: yarn outdated || echo ''
       - name: Update versions
         run: yarn upgrade --latest
@@ -38,16 +38,20 @@ jobs:
           changed_files=$(git status --porcelain --untracked-files=no | wc -l)
           if [ $changed_files -eq 0 ]; then echo '::set-output name=outdated::false'; else echo '::set-output name=outdated::true'; fi
         shell: bash
-      - name: Print
-        run: echo 'Has - ${{ steps.yarn-versions.outputs.outdated }}'
       - name: Increase version
         if: ${{ steps.yarn-versions.outputs.outdated }}
         run: yarn version --patch --no-git-tag-version
+      - name: Create branch
+        uses: peterjgrainger/action-create-branch@v2.0.1
+        with:
+          branch: bump/${{ github.run_id }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Push changes
         if: ${{ steps.yarn-versions.outputs.outdated }}
         uses: EndBug/add-and-commit@v5.2.0
         with:
-          branch: bump/${{ hashFiles('**/yarn.lock') }}
+          branch: bump/${{ github.run_id }}
           message: 'Bump dependencies'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -55,7 +59,7 @@ jobs:
         if: ${{ steps.yarn-versions.outputs.outdated }}
         uses: peter-evans/create-pull-request@v3.5.1
         with:
-          branch: bump/${{ hashFiles('**/yarn.lock') }}
+          branch: bump/${{ github.run_id }}
           delete-branch: true
           base: ${{ github.base_ref }}
           title: 'Bump dependencies'
