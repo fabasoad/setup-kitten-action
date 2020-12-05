@@ -36,8 +36,8 @@ jobs:
         id: yarn-versions
         run: |
           changed_files=$(git status --porcelain --untracked-files=no | wc -l)
-          [ $changed_files -gt 0 ] && echo '::set-output name=outdated::true'
-          [ $changed_files -eq 0 ] && echo '::set-output name=outdated::false'
+          if [ $changed_files -eq 0 ]; then echo '::set-output name=outdated::false'; else echo '::set-output name=outdated::true'; fi
+        shell: bash
       - name: Print
         run: echo 'Has - ${{ steps.yarn-versions.outputs.outdated }}'
       - name: Increase version
