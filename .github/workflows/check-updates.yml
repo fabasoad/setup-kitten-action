@@ -4,9 +4,6 @@ name: Check updates
 on:
   schedule:
     - cron: '0 0 * * 1'
-  push:
-    branches:
-      - 'test/**'
 
 env:
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
@@ -41,20 +38,6 @@ jobs:
       - name: Increase version
         if: ${{ steps.yarn-versions.outputs.outdated }}
         run: yarn version --patch --no-git-tag-version
-      # - name: Create branch
-      #   uses: peterjgrainger/action-create-branch@v2.0.1
-      #   with:
-      #     branch: bump/${{ github.run_id }}
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      # - name: Push changes
-      #   if: ${{ steps.yarn-versions.outputs.outdated }}
-      #   uses: EndBug/add-and-commit@v5.2.0
-      #   with:
-      #     branch: bump/${{ github.run_id }}
-      #     message: 'Bump dependencies'
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Create PR
         if: ${{ steps.yarn-versions.outputs.outdated }}
         uses: peter-evans/create-pull-request@v3.5.1
