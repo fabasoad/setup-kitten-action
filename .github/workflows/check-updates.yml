@@ -1,5 +1,5 @@
 ---
-name: Check versions
+name: Check updates
 
 on:
   schedule:
@@ -13,7 +13,7 @@ env:
 
 jobs:
   check_versions:
-    name: Check versions
+    name: Yarn
     timeout-minutes: 5
     runs-on: ubuntu-latest
     steps:
@@ -26,16 +26,17 @@ jobs:
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
-      - name: Validate versions
-        run: |
-          yarn outdated
-          yarn upgrade --latest
+      - name: Print outdated versions
+        run: yarn outdated
+      - name: Update versions
+        run: yarn upgrade --latest
       - name: Compile
-        if: ${{ steps.yarn-cache.outputs.cache-hit != 'true' }}
         run: yarn install
       - name: Check local changes
         id: local-changes
-        run: echo '::set-output name=has::$(git diff-index --quiet HEAD)'
+        run: |
+          echo '::set-output name=has::true'
+          git diff-index --quiet HEAD || echo '::set-output name=has::false'
       - name: Print
         run: echo 'Has - ${{ steps.local-changes.outputs.has }}'
       - name: Increase version
