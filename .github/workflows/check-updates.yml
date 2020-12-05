@@ -42,7 +42,7 @@ jobs:
         run: echo 'Has - ${{ steps.yarn-versions.outputs.outdated }}'
       - name: Increase version
         if: ${{ steps.yarn-versions.outputs.outdated }}
-        run: yarn version --patch
+        run: yarn version --patch --no-git-tag-version
       - name: Push changes
         if: ${{ steps.yarn-versions.outputs.outdated }}
         uses: EndBug/add-and-commit@v5.2.0
