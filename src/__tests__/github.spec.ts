@@ -15,11 +15,12 @@ describe('github', () => {
   it('clone should pass successfully', () => {
     const owner: string = 'lY5L080n'
     const repo: string = 'UGI49E2i'
-    const to: string = path.join(process.cwd(), repo)
-    const actual: string = clone(owner, repo)
-    expect(actual).toBe(to)
+    const to: string = 'PtAV46vh'
+    const clonedPath: string = path.join(to, repo)
+    const actual: string = clone(owner, repo, to)
+    expect(actual).toBe(clonedPath)
     expect(execSyncStub.withArgs(
-      `git clone https://github.com/${owner}/${repo}.git ${to}`).callCount)
+      `git clone https://github.com/${owner}/${repo}.git ${clonedPath}`).callCount)
       .toBe(1)
   })
 
