@@ -1,6 +1,6 @@
 {
   "name": "setup-kitten-action",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "This GitHub action installs Kitten",
   "main": "dist/index.js",
   "repository": {
@@ -44,7 +44,7 @@
     "eslint": "7.15.0",
     "eslint-config-google": "0.14.0",
     "git-branch-is": "4.0.0",
-    "husky": "4.3.0",
+    "husky": "4.3.4",
     "jest": "26.6.3",
     "jest-circus": "26.6.3",
     "mocha-param": "2.0.1",
