@@ -27,7 +27,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       - name: Print outdated versions
-        run: yarn outdated
+        run: yarn outdated || echo ''
       - name: Update versions
         run: yarn upgrade --latest
       - name: Compile
