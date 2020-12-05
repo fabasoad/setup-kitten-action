@@ -33,17 +33,18 @@ jobs:
       - name: Compile
         run: yarn install
       - name: Check local changes
-        id: local-changes
+        id: yarn-versions
         run: |
-          echo '::set-output name=has::true'
-          git diff-index --quiet HEAD || echo '::set-output name=has::false'
+          changed_files=$(git status --porcelain --untracked-files=no | wc -l)
+          [ $changed_files -gt 0 ] && echo '::set-output name=outdated::true'
+          [ $changed_files -eq 0 ] && echo '::set-output name=outdated::false'
       - name: Print
-        run: echo 'Has - ${{ steps.local-changes.outputs.has }}'
+        run: echo 'Has - ${{ steps.yarn-versions.outputs.outdated }}'
       - name: Increase version
-        if: ${{ steps.local-changes.outputs.has }}
+        if: ${{ steps.yarn-versions.outputs.outdated }}
         run: yarn version --patch
       - name: Push changes
-        if: ${{ steps.local-changes.outputs.has }}
+        if: ${{ steps.yarn-versions.outputs.outdated }}
         uses: EndBug/add-and-commit@v5.2.0
         with:
           branch: bump/${{ hashFiles('**/yarn.lock') }}
@@ -51,7 +52,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Create PR
-        if: ${{ steps.local-changes.outputs.has }}
+        if: ${{ steps.yarn-versions.outputs.outdated }}
         uses: peter-evans/create-pull-request@v3.5.1
         with:
           branch: bump/${{ hashFiles('**/yarn.lock') }}
