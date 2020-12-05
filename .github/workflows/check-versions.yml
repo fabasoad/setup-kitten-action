@@ -37,7 +37,7 @@ jobs:
         id: local-changes
         run: echo '::set-output name=has::$(git diff-index --quiet HEAD)'
       - name: Print
-        run: echo 'Has: ${{ steps.local-changes.outputs.has }}'
+        run: echo 'Has - ${{ steps.local-changes.outputs.has }}'
       - name: Increase version
         if: ${{ steps.local-changes.outputs.has }}
         run: yarn version --patch
