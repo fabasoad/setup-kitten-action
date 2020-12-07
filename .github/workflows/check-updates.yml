@@ -3,7 +3,7 @@ name: Check updates
 
 on:
   schedule:
-    - cron: '0 0 * * 1'
+    - cron: '0 21 * * 1'
 
 env:
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
@@ -15,20 +15,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2.3.4
-      - name: Cache node_modules
-        id: yarn-cache
-        uses: actions/cache@v2.1.3
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
       - name: Print outdated dependencies
         run: yarn outdated || echo ''
       - name: Update versions
         run: yarn upgrade --latest
       - name: Compile
-        run: yarn install
+        run: |
+          rm yarn.lock
+          yarn install
+          yarn run build
+        shell: bash
       - name: Check local changes
         id: yarn-versions
         run: |
