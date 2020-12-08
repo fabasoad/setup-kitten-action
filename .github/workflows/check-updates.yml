@@ -31,8 +31,8 @@ jobs:
       - name: Check local changes
         id: yarn-versions
         run: |
-          git status
           changed_files=$(git status --porcelain --untracked-files=no | wc -l)
+          echo changed_files
           if [ $changed_files -eq 0 ]; then echo '::set-output name=outdated::false'; else echo '::set-output name=outdated::true'; fi
         shell: bash
       - name: Increase version
@@ -42,7 +42,6 @@ jobs:
         if: ${{ steps.yarn-versions.outputs.outdated }}
         uses: peter-evans/create-pull-request@v3.5.1
         with:
-          assignees: github-bot
           base: main
           body: |
             # Description
@@ -53,7 +52,7 @@ jobs:
             
             - _Name:_ ${{ github.workflow }}
             - _Run ID:_ ${{ github.run_id }}
-            - _Run_ #${{ github.run_number }}
+            - _Run Number:_ ${{ github.run_number }}
           branch: bump/patch
           branch-suffix: timestamp
           commit-message: 'Bump dependencies by run #${{ github.run_id }}'
