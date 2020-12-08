@@ -4,6 +4,9 @@ name: Check updates
 on:
   schedule:
     - cron: '0 21 * * 0'
+  push:
+    branches:
+      - 'bump/**'
 
 env:
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
@@ -38,11 +41,17 @@ jobs:
         if: ${{ steps.yarn-versions.outputs.outdated }}
         uses: peter-evans/create-pull-request@v3.5.1
         with:
-          assignees: github-bot
+          assignees: 'GitHub <noreply@github.com>'
           base: main
-          body: 'Bump dependencies'
-          branch: bump/${{ github.run_id }}
+          body: |
+            Description: Bump dependencies
+            Workflow: ${{ github.workflow }}
+            Run ID ${{ github.run_id }}
+            Run #${{ github.run_number }}
+          branch: bump/patch
+          branch-suffix: timestamp
+          commit-message: 'Bump dependencies by run #${{ github.run_id }}'
           delete-branch: true
           labels: dependencies
           reviewers: fabasoad
-          title: 'Bump dependencies'
+          title: 'Bump dependencies by run #${{ github.run_id }}'
