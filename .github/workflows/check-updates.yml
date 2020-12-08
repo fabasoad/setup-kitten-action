@@ -4,9 +4,6 @@ name: Check updates
 on:
   schedule:
     - cron: '0 21 * * 0'
-  push:
-    branches:
-      - 'bump/**'
 
 env:
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
@@ -41,6 +38,7 @@ jobs:
         if: ${{ steps.git-diff.outputs.count > 0 }}
         uses: peter-evans/create-pull-request@v3.5.1
         with:
+          author: ${{ github.actor }} <${{ github.actor }}@gmail.com>
           base: main
           body: |
             ## Description
@@ -54,5 +52,5 @@ jobs:
           commit-message: 'Bump dependencies by "${{ github.workflow }} #${{ github.run_number }}"'
           delete-branch: true
           labels: dependencies
-          reviewers: fabasoad
+          reviewers: ${{ github.actor }}
           title: 'Bump dependencies by "${{ github.workflow }} #${{ github.run_number }}"'
