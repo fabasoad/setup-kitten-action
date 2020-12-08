@@ -32,7 +32,7 @@ jobs:
         id: yarn-versions
         run: |
           changed_files=$(git status --porcelain --untracked-files=no | wc -l)
-          echo changed_files
+          echo $changed_files
           if [ $changed_files -eq 0 ]; then echo '::set-output name=outdated::false'; else echo '::set-output name=outdated::true'; fi
         shell: bash
       - name: Increase version
@@ -44,19 +44,16 @@ jobs:
         with:
           base: main
           body: |
-            # Description
-
+            ## Description
             Bump dependencies
-
-            # Workflow
-            
+            ## Workflow
             - _Name:_ ${{ github.workflow }}
             - _Run ID:_ ${{ github.run_id }}
             - _Run Number:_ ${{ github.run_number }}
           branch: bump/patch
           branch-suffix: timestamp
-          commit-message: 'Bump dependencies by run #${{ github.run_id }}'
+          commit-message: 'Bump dependencies by "${{ github.workflow }} #${{ github.run_number }}"'
           delete-branch: true
           labels: dependencies
           reviewers: fabasoad
-          title: 'Bump dependencies by "${{ github.workflow }}" #${{ github.run_number }}'
+          title: 'Bump dependencies by "${{ github.workflow }} #${{ github.run_number }}"'
