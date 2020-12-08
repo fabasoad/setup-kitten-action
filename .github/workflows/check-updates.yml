@@ -29,17 +29,16 @@ jobs:
           yarn run build
         shell: bash
       - name: Check local changes
-        id: yarn-versions
+        id: git-diff
         run: |
           changed_files=$(git status --porcelain --untracked-files=no | wc -l)
-          echo $changed_files
-          if [ $changed_files -eq 0 ]; then echo '::set-output name=outdated::false'; else echo '::set-output name=outdated::true'; fi
+          echo '::set-output name=count::'$changed_files
         shell: bash
       - name: Increase version
-        if: ${{ steps.yarn-versions.outputs.outdated }}
+        if: ${{ steps.git-diff.outputs.count > 0 }}
         run: yarn version --patch --no-git-tag-version
       - name: Create PR
-        if: ${{ steps.yarn-versions.outputs.outdated }}
+        if: ${{ steps.git-diff.outputs.count > 0 }}
         uses: peter-evans/create-pull-request@v3.5.1
         with:
           base: main
