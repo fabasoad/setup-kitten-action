@@ -3,7 +3,7 @@ name: Check updates
 
 on:
   schedule:
-    - cron: '0 21 * * 1'
+    - cron: '0 21 * * 0'
 
 env:
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
@@ -38,10 +38,11 @@ jobs:
         if: ${{ steps.yarn-versions.outputs.outdated }}
         uses: peter-evans/create-pull-request@v3.5.1
         with:
+          assignees: github-bot
+          base: main
+          body: 'Bump dependencies'
           branch: bump/${{ github.run_id }}
           delete-branch: true
-          base: main
-          title: 'Bump dependencies'
-          body: 'Bump dependencies'
           labels: dependencies
           reviewers: fabasoad
+          title: 'Bump dependencies'
