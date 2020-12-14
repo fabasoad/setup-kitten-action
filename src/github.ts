@@ -6,8 +6,7 @@ import LoggerFactory from './LoggerFactory'
 
 const log: Logger = LoggerFactory.create('github')
 
-export const clone = (owner: string, repo: string, to: string):
-    string => {
+export const clone = (owner: string, repo: string, to: string): string => {
   fs.mkdirSync(to, { recursive: true })
   const clonedPath: string = path.join(to, repo)
   execSync(`git clone https://github.com/${owner}/${repo}.git ${clonedPath}`)

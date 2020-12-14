@@ -2,6 +2,7 @@
 // eslint-disable-next-line camelcase
 import child_process, { ExecSyncOptions } from 'child_process'
 import commandExists from 'command-exists'
+import os from 'os'
 import path from 'path'
 import { restore, SinonStub, stub } from 'sinon'
 import { KITTEN_CLI_NAME } from '../consts'
@@ -10,7 +11,7 @@ import KittenInstaller from '../KittenInstaller'
 
 describe('KittenInstaller', () => {
   let githubCloneStub: SinonStub<
-    [owner: string, repo: string, to?: string], string>
+    [owner: string, repo: string, to: string], string>
   let execSyncStub: SinonStub<
     [command: string, options?: ExecSyncOptions], Buffer>
   let commandExistsStub: SinonStub<[commandName: string], boolean>
@@ -24,6 +25,7 @@ describe('KittenInstaller', () => {
   it('should install successfully', async () => {
     const repo: string = 'kitten'
     const repoDir: string = '5zs1kbe5'
+    const to: string = path.join(os.homedir(), '.local', 'bin')
     const stackYamlPath: string = path.join(repoDir, 'stack.yaml')
     commandExistsStub.returns(false)
     githubCloneStub.returns(repoDir)
@@ -48,7 +50,8 @@ describe('KittenInstaller', () => {
 
     expect(commandExistsStub.withArgs(kittenExeFileName).callCount).toBe(1)
     expect(getStackExeFileNameMock.mock.calls.length).toBe(1)
-    expect(githubCloneStub.withArgs('evincarofautumn', repo).callCount).toBe(1)
+    expect(githubCloneStub.withArgs('evincarofautumn', repo, to).callCount)
+      .toBe(1)
     expect(execSyncStub.withArgs(
       `${stackExeFileName} setup --stack-yaml ${stackYamlPath}`).callCount)
       .toBe(1)
