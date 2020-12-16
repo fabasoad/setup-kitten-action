@@ -68,9 +68,9 @@ jobs:
         uses: mstksg/setup-stack@v2
       - name: Setup Kitten
         if: ${{ matrix.install_kitten }}
-        uses: fabasoad/setup-kitten-action@v1.0.2
+        uses: fabasoad/setup-kitten-action@main
       - name: "Setup Kitten (skipped: ${{ matrix.install_kitten }})"
-        uses: fabasoad/setup-kitten-action@v1.0.2
+        uses: fabasoad/setup-kitten-action@main
       - name: Run script (Linux, MacOS)
         if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
         run: kitten ./hello-world.ktn
