@@ -2,5 +2,6 @@
 . "$(dirname $0)/_/husky.sh"
 
 yarn git-branch-is --not main
+git secrets --pre_commit_hook -- "$@"
 yarn run build
 git add dist/index.js
