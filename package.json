@@ -12,11 +12,12 @@
     "lint:md": "markdownlint --config .markdownlint.yml '**/*.md'",
     "lint:ts": "eslint --ext ts src",
     "lint": "yarn run lint:md && yarn run lint:ts",
+    "postinstall": "yarn husky install",
+    "prepare": "yarn run snyk-protect",
     "security:auth": "snyk auth",
     "security:test": "snyk test",
-    "test": "jest --config=jest.config.json --coverage",
     "snyk-protect": "snyk protect",
-    "prepare": "yarn run snyk-protect"
+    "test": "jest --config=jest.config.json --coverage"
   },
   "keywords": [
     "actions",
