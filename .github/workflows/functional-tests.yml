@@ -1,44 +1,19 @@
 ---
-name: CI (latest)
+name: Functional Tests
 
 on:
   push:
-    tags:
-      - 'v*.*.*'
+    branches:
+      - main
+      - 'bugfix/**'
+      - 'feature/**'
 
 env:
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
 jobs:
-  unit_tests:
-    name: Unit tests
-    timeout-minutes: 20
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2.3.4
-        with:
-          ref: ${{ github.ref }}
-      - name: Cache node_modules
-        id: yarn-cache
-        uses: actions/cache@v2.1.3
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - name: Compile
-        if: ${{ steps.yarn-cache.outputs.cache-hit != 'true' }}
-        run: yarn install
-      - name: Lint
-        run: yarn run lint
-      - name: Security tests
-        run: |
-          yarn run security:auth ${{ secrets.SNYK_API_TOKEN }}
-          yarn run security:test
-      - name: Unit tests
-        run: yarn run test
   functional_tests:
-    name: Functional tests
+    name: Run script
     timeout-minutes: 20
     strategy:
       matrix:
@@ -52,7 +27,7 @@ jobs:
           ref: ${{ github.ref }}
       - name: Cache node_modules
         id: yarn-cache
-        uses: actions/cache@v2.1.3
+        uses: actions/cache@v2.1.4
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
@@ -68,9 +43,9 @@ jobs:
         uses: mstksg/setup-stack@v2
       - name: Setup Kitten
         if: ${{ matrix.install_kitten }}
-        uses: fabasoad/setup-kitten-action@main
+        uses: ./
       - name: "Setup Kitten (skipped: ${{ matrix.install_kitten }})"
-        uses: fabasoad/setup-kitten-action@main
+        uses: ./
       - name: Run script (Linux, MacOS)
         if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
         run: kitten ./hello-world.ktn
