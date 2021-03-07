@@ -1,4 +1,4 @@
-import os from 'os'
+import { platform } from 'os'
 
 export default class CliExeNameProvider implements ICliExeNameProvider {
   private cliName: string
@@ -6,7 +6,7 @@ export default class CliExeNameProvider implements ICliExeNameProvider {
     this.cliName = cliName
   }
   getExeFileName(): string {
-    switch (os.platform()) {
+    switch (platform()) {
     case 'win32':
       return `${this.cliName}.exe`
     default:
