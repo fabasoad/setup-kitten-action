@@ -1,8 +1,9 @@
-import glob, { IOptions } from 'glob'
+import { sync } from 'glob'
 import itParam from 'mocha-param'
 import path from 'path'
-import { restore, SinonStub, stub } from 'sinon'
 import ExecutableFileFinder from '../ExecutableFileFinder'
+
+jest.mock('glob', () => ({ sync: jest.fn() }))
 
 interface INegativeTestFixture {
   message: string
@@ -18,23 +19,19 @@ describe('ExecutableFileFinder', () => {
     message: 'Execution file has not been found',
     suffix: 'u4h0t03e'
   }]
-  let globSyncStub: SinonStub<[pattern: string, options?: IOptions], string[]>
-
-  beforeEach(() => {
-    globSyncStub = stub(glob, 'sync')
-  })
 
   it('should find successfully', () => {
     const folderPath: string = '4se2ov6f'
     const cliName: string = '1clx8w43'
-    const files: string[] = [cliName + SUFFIX, cliName]
-    globSyncStub.returns(files)
+    const files: string[] = [cliName + SUFFIX, cliName];
+    (sync as jest.Mock).mockImplementation(() => files)
     const finder: ExecutableFileFinder = new ExecutableFileFinder(cliName, {
       getExeFileName: (): string => SUFFIX
     })
     const actual: string = finder.find(folderPath, cliName)
-    expect(globSyncStub.withArgs(
-      `${folderPath}${path.sep}**${path.sep}${cliName}*`).callCount).toBe(1)
+    expect((sync as jest.Mock).mock.calls.length).toBe(1)
+    expect(sync).toHaveBeenCalledWith(
+      `${folderPath}${path.sep}**${path.sep}${cliName}*`)
     expect(actual).toBe(files[0])
   })
 
@@ -42,8 +39,8 @@ describe('ExecutableFileFinder', () => {
     items, (item: INegativeTestFixture) => {
       const folderPath: string = '4se2ov6f'
       const cliName: string = '1clx8w43'
-      const files: string[] = [cliName + SUFFIX, `gt11c1zr${SUFFIX}`]
-      globSyncStub.returns(files)
+      const files: string[] = [cliName + SUFFIX, `gt11c1zr${SUFFIX}`];
+      (sync as jest.Mock).mockImplementation(() => files)
       const finder: ExecutableFileFinder = new ExecutableFileFinder(cliName, {
         getExeFileName: (): string => item.suffix
       })
@@ -51,12 +48,13 @@ describe('ExecutableFileFinder', () => {
         finder.find(folderPath, cliName)
       } catch (e) {
         expect((<Error>e).message).toContain(item.message)
-        expect(globSyncStub.withArgs(
-          `${folderPath}${path.sep}**${path.sep}${cliName}*`).callCount).toBe(1)
+        expect((sync as jest.Mock).mock.calls.length).toBe(1)
+        expect(sync).toHaveBeenCalledWith(
+          `${folderPath}${path.sep}**${path.sep}${cliName}*`)
         return
       }
       fail()
     })
 
-  afterEach(() => restore())
+  afterEach(() => (sync as jest.Mock).mockClear())
 })

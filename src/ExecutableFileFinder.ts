@@ -1,4 +1,4 @@
-import glob from 'glob'
+import { sync } from 'glob'
 import path from 'path'
 import { Logger } from 'winston'
 import CliExeNameProvider from './CliExeNameProvider'
@@ -18,7 +18,7 @@ export default class ExecutableFileFinder implements IExecutableFileFinder {
   find(folderPath: string, cliName: string): string {
     const pattern: string =
       `${folderPath}${path.sep}**${path.sep}${cliName}*`
-    const files: string[] = glob.sync(pattern)
+    const files: string[] = sync(pattern)
       .filter((f: string) => f.endsWith(this.provider.getExeFileName()))
     if (files.length === 0) {
       throw new Error('Execution file has not been found under ' +

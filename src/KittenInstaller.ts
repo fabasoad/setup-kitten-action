@@ -11,12 +11,16 @@ import { clone } from './github'
 import InstallerBase from './InstallerBase'
 import LoggerFactory from './LoggerFactory'
 
+// eslint-disable-next-line no-unused-vars
+type ExecFunction = (command: string) => void
+
 export default class KittenInstaller extends InstallerBase {
   private INSTALL_DIR: string = path.join(os.homedir(), '.local', 'bin')
 
   private _stackProvider: ICliExeNameProvider
   private _finder: IExecutableFileFinder
   private _cache: ICache
+  private _execSync: ExecFunction
   private _log: Logger
 
   constructor(
@@ -24,11 +28,13 @@ export default class KittenInstaller extends InstallerBase {
     kittenProvider: ICliExeNameProvider =
     new CliExeNameProvider(KITTEN_CLI_NAME),
     finder: IExecutableFileFinder = new ExecutableFileFinder(KITTEN_CLI_NAME),
-    cache: ICache = new Cache('1.0.0', KITTEN_CLI_NAME)) {
+    cache: ICache = new Cache('1.0.0', KITTEN_CLI_NAME),
+    executeSync: ExecFunction = (command: string) => execSync(command)) {
     super(kittenProvider)
     this._stackProvider = stackProvider
     this._finder = finder
     this._cache = cache
+    this._execSync = executeSync
     this._log = LoggerFactory.create('KittenInstaller')
   }
 
@@ -41,11 +47,11 @@ export default class KittenInstaller extends InstallerBase {
 
     const cmd1: string = `${stackCliName} setup --stack-yaml ${stackYamlPath}`
     this._log.info(`Running > ${cmd1}`)
-    execSync(cmd1)
+    this._execSync(cmd1)
 
     const cmd2: string = `${stackCliName} build --stack-yaml ${stackYamlPath}`
     this._log.info(`Running > ${cmd2}`)
-    execSync(cmd2)
+    this._execSync(cmd2)
 
     const stackWorkDir: string = path.join(repoDir, '.stack-work', 'install')
     const execFilePath: string =

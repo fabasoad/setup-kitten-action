@@ -1,7 +1,8 @@
 import itParam from 'mocha-param'
-import os from 'os'
-import { restore, SinonStub, stub } from 'sinon'
+import { platform } from 'os'
 import CliExeNameProvider from '../CliExeNameProvider'
+
+jest.mock('os', () => ({ platform: jest.fn() }))
 
 interface IFixture {
   platform: string
@@ -10,8 +11,6 @@ interface IFixture {
 }
 
 describe('CliExeNameProvider', () => {
-  let osPlatformStub: SinonStub<[], string>
-
   const items: IFixture[] = [{
     platform: 'win32',
     actual: 'n4LSZ7i0',
@@ -26,17 +25,13 @@ describe('CliExeNameProvider', () => {
     expected: '08drSDMo'
   }]
 
-  beforeEach(() => {
-    osPlatformStub = stub(os, 'platform')
-  })
-
   itParam('should return exe name successfully (${value.platform})',
     items, (item: IFixture) => {
-      osPlatformStub.returns(item.platform)
+      (platform as jest.Mock).mockImplementation(() => item.platform)
       const provider: CliExeNameProvider = new CliExeNameProvider(item.actual)
       const actual: string = provider.getExeFileName()
       expect(actual).toBe(item.expected)
     })
 
-  afterEach(() => restore())
+  afterEach(() => (platform as jest.Mock).mockClear())
 })
