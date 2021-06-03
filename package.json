@@ -28,7 +28,7 @@
   "homepage": "https://github.com/fabasoad/setup-kitten-action#readme",
   "dependencies": {
     "@actions/core": "1.2.7",
-    "@actions/tool-cache": "1.6.1",
+    "@actions/tool-cache": "1.7.0",
     "command-exists": "1.2.9",
     "glob": "7.1.6",
     "winston": "3.3.3"
