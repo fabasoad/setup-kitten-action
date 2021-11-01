@@ -24,7 +24,7 @@ jobs:
         install_kitten: [true, false]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@v2.3.5
         with:
           ref: ${{ github.ref }}
       - name: Cache node_modules
