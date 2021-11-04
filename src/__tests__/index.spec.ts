@@ -5,11 +5,11 @@ import { run } from '../index'
 
 describe('index > run', () => {
   class InstallerMock {
-      calls: number = 0
-      async install(): Promise<void> {
-        this.calls++
-        return Promise.resolve()
-      }
+    calls: number = 0
+    async install(): Promise<void> {
+      this.calls++
+      return Promise.resolve()
+    }
   }
 
   interface INegativeTestFixture {
