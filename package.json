@@ -31,7 +31,7 @@
     "@actions/tool-cache": "1.7.1",
     "command-exists": "1.2.9",
     "glob": "7.2.0",
-    "winston": "3.3.3"
+    "winston": "3.5.1"
   },
   "devDependencies": {
     "@types/chai": "4.3.0",
