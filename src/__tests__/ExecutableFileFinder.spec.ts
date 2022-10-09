@@ -1,60 +1,46 @@
-import { sync } from 'glob'
-import itParam from 'mocha-param'
-import path from 'path'
 import ExecutableFileFinder from '../ExecutableFileFinder'
+import fs from 'fs';
+import itParam from 'mocha-param';
 
-jest.mock('glob', () => ({ sync: jest.fn() }))
+const TEST_EXE = 'file.exe'
 
-interface INegativeTestFixture {
-  message: string
-  suffix: string
-}
+jest.mock('fs', () => ({
+  readdirSync: jest.fn((dirPath: string) => {
+    switch (dirPath) {
+    case 'folder1': return ['file.txt', 'folder2']
+    case 'folder1/folder2': return [TEST_EXE]
+    default: return []
+    }
+  }),
+  statSync: jest.fn((dirPath: string) => ({
+    isDirectory: jest.fn(() => dirPath.endsWith('folder1') ||
+        dirPath.endsWith('folder2'))
+  }))
+}))
 
-describe('ExecutableFileFinder', () => {
-  const SUFFIX: string = '3ttg37ne'
-  const items: INegativeTestFixture[] = [{
-    message: 'There are more than 1 execution file has been found',
-    suffix: SUFFIX
-  }, {
-    message: 'Execution file has not been found',
-    suffix: 'u4h0t03e'
-  }]
+describe('ExecutableFileFinder::find', () => {
+  let finder: ExecutableFileFinder
 
-  it('should find successfully', () => {
-    const folderPath: string = '4se2ov6f'
-    const cliName: string = '1clx8w43'
-    const files: string[] = [cliName + SUFFIX, cliName];
-    (sync as jest.Mock).mockImplementation(() => files)
-    const finder: ExecutableFileFinder = new ExecutableFileFinder(cliName, {
-      getExeFileName: (): string => SUFFIX
+  beforeEach(() => {
+    (fs.readdirSync as jest.Mock).mockClear();
+    (fs.statSync as jest.Mock).mockClear()
+    const cliName = '1clx8w43'
+    finder = new ExecutableFileFinder(cliName, {
+      getExeFileName: () => TEST_EXE
     })
-    const actual: string = finder.find(folderPath, cliName)
-    expect((sync as jest.Mock).mock.calls.length).toBe(1)
-    expect(sync).toHaveBeenCalledWith(
-      `${folderPath}${path.sep}**${path.sep}${cliName}*`)
-    expect(actual).toBe(files[0])
   })
 
-  itParam('should throw error (${value.message})',
-    items, (item: INegativeTestFixture) => {
-      const folderPath: string = '4se2ov6f'
-      const cliName: string = '1clx8w43'
-      const files: string[] = [cliName + SUFFIX, `gt11c1zr${SUFFIX}`];
-      (sync as jest.Mock).mockImplementation(() => files)
-      const finder: ExecutableFileFinder = new ExecutableFileFinder(cliName, {
-        getExeFileName: (): string => item.suffix
-      })
-      try {
-        finder.find(folderPath, cliName)
-      } catch (e) {
-        expect((<Error>e).message).toContain(item.message)
-        expect((sync as jest.Mock).mock.calls.length).toBe(1)
-        expect(sync).toHaveBeenCalledWith(
-          `${folderPath}${path.sep}**${path.sep}${cliName}*`)
-        return
-      }
-      fail()
-    })
+  it('should find successfully', () => {
+    const dirPath = 'folder1'
+    const actual: string = finder.find(dirPath)
+    expect(actual).toBe(`folder1/folder2/${TEST_EXE}`)
+  })
 
-  afterEach(() => (sync as jest.Mock).mockClear())
+  itParam(
+    'should not find successfully (${value})',
+    ['folder3', null],
+    (dirPath: string) => {
+      expect(() => finder.find(dirPath)).toThrow(
+        `Execution file has not been found under ${dirPath} folder`)
+    })
 })
