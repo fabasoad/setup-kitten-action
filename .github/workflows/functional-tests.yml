@@ -5,13 +5,8 @@ on:
   push:
     branches:
       - 'main'
-      - 'bugfix/**'
-      - 'dependabot/**'
-      - 'feature/**'
-      - 'snyk-*'
-
-env:
-  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+      - 'fix-*'
+      - 'feature-*'
 
 jobs:
   functional_tests:
@@ -24,12 +19,12 @@ jobs:
         install_kitten: [true, false]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v3
         with:
           ref: ${{ github.ref }}
       - name: Cache node_modules
         id: yarn-cache
-        uses: actions/cache@v2.1.7
+        uses: actions/cache@v2
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
@@ -37,7 +32,7 @@ jobs:
             ${{ runner.os }}-yarn-
       - name: Compile
         if: ${{ steps.yarn-cache.outputs.cache-hit != 'true' }}
-        run: yarn install
+        run: yarn install --ignore-scripts
       - name: Build
         run: yarn run build
       - name: Setup Stack
