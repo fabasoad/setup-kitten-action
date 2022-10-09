@@ -1,33 +1,33 @@
-import { sync } from 'glob'
 import path from 'path'
+import { readdirSync, statSync } from 'fs'
 import { Logger } from 'winston'
 import CliExeNameProvider from './CliExeNameProvider'
+import { KITTEN_CLI_NAME } from './consts'
 import LoggerFactory from './LoggerFactory'
 
 export default class ExecutableFileFinder implements IExecutableFileFinder {
-  private log: Logger
-  private provider: ICliExeNameProvider
+  private readonly log: Logger = LoggerFactory.create(ExecutableFileFinder.name)
+  private readonly provider: ICliExeNameProvider
 
   constructor(
     cliName: string,
     provider: ICliExeNameProvider = new CliExeNameProvider(cliName)) {
     this.provider = provider
-    this.log = LoggerFactory.create('ExecutableFileFinder')
   }
 
-  find(folderPath: string, cliName: string): string {
-    const pattern: string =
-      `${folderPath}${path.sep}**${path.sep}${cliName}*`
-    const files: string[] = sync(pattern)
-      .filter((f: string) => f.endsWith(this.provider.getExeFileName()))
-    if (files.length === 0) {
-      throw new Error('Execution file has not been found under ' +
-        `${folderPath} folder using ${pattern} pattern`)
-    } else if (files.length > 1) {
-      throw new Error('There are more than 1 execution file has been found ' +
-        `under ${folderPath} folder using ${pattern} pattern: ${files}`)
+  find(dirPath: string): string {
+    const files: string[] = [dirPath]
+    while (files.length > 0) {
+      const filePath: string = files.pop() || ''
+      if (statSync(filePath).isDirectory()) {
+        readdirSync(filePath)
+          .forEach((f: string) => files.push(`${filePath}${path.sep}${f}`))
+      } else if (filePath.endsWith(this.provider.getExeFileName())) {
+        this.log.info(`${KITTEN_CLI_NAME} path is ${filePath}`)
+        return filePath
+      }
     }
-    this.log.info(`${cliName} path is ${files[0]}`)
-    return files[0]
+    throw new Error('Execution file has not been found under ' +
+        `${dirPath} folder`)
   }
 }
