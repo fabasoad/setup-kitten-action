@@ -35,7 +35,7 @@ jobs:
         run: yarn run build
       - name: Setup Kitten
         uses: ./
-      - name: Run script (Linux, MacOS)
+      - name: Run script (Linux, macOS)
         if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
         run: kitten ./hello-world.ktn
       - name: Run script (Windows)
