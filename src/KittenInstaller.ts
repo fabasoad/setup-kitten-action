@@ -57,6 +57,6 @@ export default class KittenInstaller extends InstallerBase {
     const execFilePath: string =
       this._finder.find(stackWorkDir, KITTEN_CLI_NAME)
     addPath(path.dirname(execFilePath))
-    this._cache.cache(execFilePath)
+    return this._cache.cache(execFilePath)
   }
 }
