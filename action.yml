@@ -10,9 +10,9 @@ runs:
   steps:
     - name: Setup Kitten
       run: |
-        bin_path="$HOME/.local/bin"
-        kitten_path="$bin_path/kitten"
-        git clone https://github.com/evincarofautumn/kitten.git $bin_path
+        kitten_path="$HOME/.local/bin/kitten"
+        mkdir -p $kitten_path
+        git clone https://github.com/evincarofautumn/kitten.git $kitten_path
         stack setup --stack-yaml $kitten_path/stack.yaml
         stack build --stack-yaml $kitten_path/stack.yaml
         echo "$kitten_path/.stack-work/install" >> $GITHUB_PATH
