@@ -14,31 +14,17 @@ jobs:
     name: Run script
     timeout-minutes: 20
     strategy:
+      fail-fast: false
       matrix:
         os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
-        with:
-          ref: ${{ github.ref }}
-      - name: Cache node_modules
-        id: yarn-cache
-        uses: actions/cache@v2
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - name: Compile
-        if: ${{ steps.yarn-cache.outputs.cache-hit != 'true' }}
-        run: yarn install --ignore-scripts
-      - name: Build
-        run: yarn run build
       - name: Setup Kitten
         uses: ./
       - name: Run script (Linux, macOS)
-        if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
+        if: ${{ matrix.os != 'windows-latest' }}
         run: kitten ./hello-world.ktn
       - name: Run script (Windows)
-        if: matrix.os == 'windows-latest'
+        if: ${{ matrix.os == 'windows-latest' }}
         run: kitten.exe ./hello-world.ktn
