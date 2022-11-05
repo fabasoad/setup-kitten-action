@@ -30,7 +30,9 @@ runs:
       working-directory: ${{ steps.vars.outputs.KITTEN_PATH }}
     - name: Add Kitten to PATH
       run: |
-        bin_path=$(find "${{ steps.vars.outputs.KITTEN_PATH }}/.stack-work/install" -name "kitten*" | xargs dirname)
-        echo "Executable file has been found at $bin_path"
+        p=$(find "${{ steps.vars.outputs.KITTEN_PATH }}/.stack-work/install" -name "kitten*")
+        echo "Executable file has been found at $p"
+        bin_path=$(dirname $p)
+        echo "Parent folder of Executable file is $bin_path"
         echo "$bin_path" >> $GITHUB_PATH
       shell: bash
