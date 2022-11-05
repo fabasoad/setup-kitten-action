@@ -10,26 +10,26 @@ on:
       - 'pre-commit-ci-update-config'
 
 jobs:
-  run-script:
-    name: Run script
-    timeout-minutes: 20
-    strategy:
-      fail-fast: false
-      matrix:
-        os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v3
-      - name: Setup Kitten
-        uses: ./
-      - name: Run script (Linux, macOS)
-        if: ${{ matrix.os != 'windows-latest' }}
-        run: kitten ./hello-world.ktn
-        shell: bash
-      - name: Run script (Windows)
-        if: ${{ matrix.os == 'windows-latest' }}
-        run: kitten.exe ./hello-world.ktn
-        shell: pwsh
+#  run-script:
+#    name: Run script
+#    timeout-minutes: 20
+#    strategy:
+#      fail-fast: false
+#      matrix:
+#        os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
+#    runs-on: ${{ matrix.os }}
+#    steps:
+#      - uses: actions/checkout@v3
+#      - name: Setup Kitten
+#        uses: ./
+#      - name: Run script (Linux, macOS)
+#        if: ${{ matrix.os != 'windows-latest' }}
+#        run: kitten ./hello-world.ktn
+#        shell: bash
+#      - name: Run script (Windows)
+#        if: ${{ matrix.os == 'windows-latest' }}
+#        run: kitten.exe ./hello-world.ktn
+#        shell: pwsh
   run-script-alpine:
     name: Run script (alpine-latest)
     timeout-minutes: 20
@@ -38,7 +38,11 @@ jobs:
       image: alpine:latest
     steps:
       - uses: actions/checkout@v3
+      - name: Install tools
+        run: apk add bash
+        shell: sh
       - name: Setup Kitten
         uses: ./
       - name: Run script
         run: kitten ./hello-world.ktn
+        shell: bash
