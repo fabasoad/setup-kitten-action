@@ -39,7 +39,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Install tools
-        run: apk add bash git curl
+        run: apk --update add bash git curl tar
         shell: sh
       - name: Setup Stack
         uses: mstksg/setup-stack@v2
