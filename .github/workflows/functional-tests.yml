@@ -16,7 +16,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
+#        os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
+        os: ['windows-latest']
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
@@ -27,4 +28,7 @@ jobs:
         run: kitten ./hello-world.ktn
       - name: Run script (Windows)
         if: ${{ matrix.os == 'windows-latest' }}
-        run: kitten.exe ./hello-world.ktn
+        run: |
+          echo $env:PATH
+          kitten.exe ./hello-world.ktn
+        shell: pwsh
