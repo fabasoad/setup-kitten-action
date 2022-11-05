@@ -9,8 +9,10 @@ runs:
   using: 'composite'
   steps:
     - name: Clone Kitten repository
+      env:
+        KITTEN_VERSION: a5301fe24dbb9ea91974abee73ad544156ee4722 # pragma: allowlist secret
       run: |
-        kitten_path="~/.local/bin/kitten"
+        kitten_path="$RUNNER_TEMP/kitten"
         mkdir -p $kitten_path
         git clone https://github.com/evincarofautumn/kitten.git $kitten_path
         cd $kitten_path
@@ -20,19 +22,17 @@ runs:
       id: cache-stack-work
       name: Cache .stack-work
       with:
-        path: ~/.local/bin/kitten/.stack-work
-        key: ${{ runner.os }}-stack-work-${{ hashFiles('~/.local/bin/kitten/stack.yaml') }}-${{ hashFiles('~/.local/bin/kitten/**/*.hs') }}
+        path: ${{ env.RUNNER_TEMP }}/kitten/.stack-work
+        key: ${{ runner.os }}-stack-work-${{ hashFiles('${{ env.RUNNER_TEMP }}/kitten/stack.yaml') }}-${{ hashFiles('${{ env.RUNNER_TEMP }}/kitten/**/*.hs') }}
         restore-keys: |
           ${{ runner.os }}-stack-work-
     - name: Build Kitten
       if: ${{ steps.cache-stack-work.outputs.cache-hit != 'true' }}
-      env:
-        KITTEN_VERSION: a5301fe24dbb9ea91974abee73ad544156ee4722 # pragma: allowlist secret
       run: |
-        kitten_path="~/.local/bin/kitten"
+        kitten_path="$RUNNER_TEMP/kitten"
         stack setup --stack-yaml $kitten_path/stack.yaml
         stack build --stack-yaml $kitten_path/stack.yaml
       shell: bash
     - name: Add Kitten to PATH
-      run: echo "$(find ~/.local/bin/kitten/.stack-work/install -name "kitten*" | xargs dirname)" >> $GITHUB_PATH
+      run: echo "$(find $RUNNER_TEMP/kitten/.stack-work/install -name "kitten*" | xargs dirname)" >> $GITHUB_PATH
       shell: bash
