@@ -13,10 +13,17 @@ runs:
       run: |
         if [[ "${{ runner.os }}" == "Windows" ]]; then
           CLI_NAME=kitten.exe
+          BINARY_NAME=windows
         else
           CLI_NAME=kitten
+          if [[ "${{ runner.os }}" == "Linux" ]]; then
+            BINARY_NAME=linux
+          else
+            BINARY_NAME=osx
+          fi
         fi
         echo "CLI_NAME=$CLI_NAME" >> $GITHUB_OUTPUT
+        echo "BINARY_NAME=$BINARY_NAME" >> $GITHUB_OUTPUT
         KITTEN_INSTALLED=$(if command -v $CLI_NAME >/dev/null 2>&1; then echo true; else echo false; fi)
         echo "KITTEN_INSTALLED=$KITTEN_INSTALLED" >> $GITHUB_OUTPUT
         STACK_INSTALLED=$(if command -v stack >/dev/null 2>&1; then echo true; else echo false; fi)
@@ -26,17 +33,22 @@ runs:
         mkdir -p "$RUNNER_TEMP/stack"
         echo "STACK_PATH=$RUNNER_TEMP/stack" >> $GITHUB_OUTPUT
       shell: bash
-    - name: Setup Stack (Linux, macOS)
+    - name: Setup Stack
       if: ${{ steps.info.outputs.STACK_INSTALLED == 'false' && runner.os != 'Windows' }}
-      run: curl -sSL https://get.haskellstack.org/ | sh
-      shell: bash
-    - name: Setup Stack (Windows)
-      if: ${{ steps.info.outputs.STACK_INSTALLED == 'false' && runner.os == 'Windows' }}
       run: |
-        Invoke-WebRequest -OutFile ${{ steps.info.outputs.STACK_PATH }}/stack.zip -Uri https://get.haskellstack.org/stable/windows-x86_64.zip
-        Expand-Archive ${{ steps.info.outputs.STACK_PATH }}/stack.zip -DestinationPath ${{ steps.info.outputs.STACK_PATH }}
-        Remove-Item ${{ steps.info.outputs.STACK_PATH }}/stack.zip
-      shell: pwsh
+        wget -c https://get.haskellstack.org/stable/${{ steps.info.outputs.BINARY_NAME }}-x86_64.tar.gz -O - | tar -xz
+        exe_path=$(find . -name "stack*")
+        stack_path=$(dirname "$exe_path")
+        chmod +x "exe_path"
+        echo "$stack_path" >> $GITHUB_PATH
+      shell: bash
+#    - name: Setup Stack (Windows)
+#      if: ${{ steps.info.outputs.STACK_INSTALLED == 'false' && runner.os == 'Windows' }}
+#      run: |
+#        Invoke-WebRequest -OutFile ${{ steps.info.outputs.STACK_PATH }}/stack.zip -Uri https://get.haskellstack.org/stable/windows-x86_64.zip
+#        Expand-Archive ${{ steps.info.outputs.STACK_PATH }}/stack.zip -DestinationPath ${{ steps.info.outputs.STACK_PATH }}
+#        Remove-Item ${{ steps.info.outputs.STACK_PATH }}/stack.zip
+#      shell: pwsh
     - name: Clone Kitten repository
       if: ${{ steps.info.outputs.KITTEN_INSTALLED == 'false' }}
       env:
