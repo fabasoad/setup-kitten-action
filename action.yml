@@ -8,6 +8,40 @@ branding:
 runs:
   using: 'composite'
   steps:
+    - uses: actions/cache@v3
+      name: Cache ~/.stack
+      if: ${{ runner.os != 'Windows' }}
+      with:
+        path: ~/.stack
+        key: ${{ runner.os }}-stack-global-${{ hashFiles('stack.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-stack-global-
+    - uses: actions/cache@v3
+      name: Cache .stack-work
+      if: ${{ runner.os != 'Windows' }}
+      with:
+        path: .stack-work
+        key: ${{ runner.os }}-stack-work-${{ hashFiles('stack.yaml') }}-${{ hashFiles('**/*.hs') }}
+        restore-keys: |
+          ${{ runner.os }}-stack-work-
+    - uses: actions/cache@v3
+      name: Cache %APPDATA%\stack %LOCALAPPDATA%\Programs\stack
+      if: ${{ runner.os == 'Windows' }}
+      with:
+        path: |
+          ~\AppData\Roaming\stack
+          ~\AppData\Local\Programs\stack
+        key: ${{ runner.os }}-stack-global-${{ hashFiles('stack.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-stack-global-
+    - uses: actions/cache@v3
+      name: Cache .stack-work
+      if: ${{ runner.os == 'Windows' }}
+      with:
+        path: .stack-work
+        key: ${{ runner.os }}-stack-work-${{ hashFiles('stack.yaml') }}-${{ hashFiles('**/*.hs') }}
+        restore-keys: |
+          ${{ runner.os }}-stack-work-
     - name: Setup Kitten
       run: |
         kitten_path="$HOME/.local/bin/kitten"
@@ -15,5 +49,5 @@ runs:
         git clone https://github.com/evincarofautumn/kitten.git $kitten_path
         stack setup --stack-yaml $kitten_path/stack.yaml
         stack build --stack-yaml $kitten_path/stack.yaml
-        echo "$kitten_path/.stack-work/install" >> $GITHUB_PATH
+        echo "$(find $kitten_path/.stack-work/install -name "kitten*" | xargs dirname)" >> $GITHUB_PATH
       shell: bash
