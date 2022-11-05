@@ -11,14 +11,14 @@ runs:
     - name: Define vars
       id: vars
       run: |
-        mkdir -p $RUNNER_TEMP/kitten
+        mkdir -p "$RUNNER_TEMP/kitten"
         echo "KITTEN_PATH=$RUNNER_TEMP/kitten" >> $GITHUB_OUTPUT
       shell: bash
     - name: Clone Kitten repository
       env:
         KITTEN_VERSION: a5301fe24dbb9ea91974abee73ad544156ee4722 # pragma: allowlist secret
       run: |
-        git clone https://github.com/evincarofautumn/kitten.git ${{ steps.vars.outputs.KITTEN_PATH }}
+        git clone https://github.com/evincarofautumn/kitten.git "${{ steps.vars.outputs.KITTEN_PATH }}"
         git reset --hard $KITTEN_VERSION
       shell: bash
       working-directory: ${{ steps.vars.outputs.KITTEN_PATH }}
@@ -38,5 +38,5 @@ runs:
       shell: bash
       working-directory: ${{ steps.vars.outputs.KITTEN_PATH }}
     - name: Add Kitten to PATH
-      run: echo "$(find ${{ steps.vars.outputs.KITTEN_PATH }}/.stack-work/install -name "kitten*" | xargs dirname)" >> $GITHUB_PATH
+      run: find "${{ steps.vars.outputs.KITTEN_PATH }}/.stack-work/install" -name "kitten*" | xargs dirname >> $GITHUB_PATH
       shell: bash
