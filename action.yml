@@ -8,50 +8,31 @@ branding:
 runs:
   using: 'composite'
   steps:
-    - uses: actions/cache@v3
-      name: Cache ~/.stack
-      if: ${{ runner.os != 'Windows' }}
-      with:
-        path: ~/.stack
-        key: ${{ runner.os }}-stack-global-${{ hashFiles('~/.local/bin/kitten/stack.yaml') }}
-        restore-keys: |
-          ${{ runner.os }}-stack-global-
-    - uses: actions/cache@v3
-      name: Cache .stack-work
-      if: ${{ runner.os != 'Windows' }}
-      with:
-        path: ~/.local/bin/kitten/.stack-work
-        key: ${{ runner.os }}-stack-work-${{ hashFiles('~/.local/bin/kitten/stack.yaml') }}-${{ hashFiles('~/.local/bin/kitten/**/*.hs') }}
-        restore-keys: |
-          ${{ runner.os }}-stack-work-
-    - uses: actions/cache@v3
-      name: Cache %APPDATA%\stack %LOCALAPPDATA%\Programs\stack
-      if: ${{ runner.os == 'Windows' }}
-      with:
-        path: |
-          ~\AppData\Roaming\stack
-          ~\AppData\Local\Programs\stack
-        key: ${{ runner.os }}-stack-global-${{ hashFiles('~\.local\bin\kitten\stack.yaml') }}
-        restore-keys: |
-          ${{ runner.os }}-stack-global-
-    - uses: actions/cache@v3
-      name: Cache .stack-work
-      if: ${{ runner.os == 'Windows' }}
-      with:
-        path: ~\.local\bin\kitten\.stack-work
-        key: ${{ runner.os }}-stack-work-${{ hashFiles('~\.local\bin\kitten\stack.yaml') }}-${{ hashFiles('~\.local\bin\kitten\**\*.hs') }}
-        restore-keys: |
-          ${{ runner.os }}-stack-work-
-    - name: Build Kitten
-      env:
-        KITTEN_VERSION: a5301fe24dbb9ea91974abee73ad544156ee4722 # pragma: allowlist secret
+    - name: Clone Kitten repository
       run: |
         kitten_path="~/.local/bin/kitten"
         mkdir -p $kitten_path
         git clone https://github.com/evincarofautumn/kitten.git $kitten_path
         cd $kitten_path
         git reset --hard $KITTEN_VERSION
-        stack setup --stack-yaml stack.yaml
-        stack build --stack-yaml stack.yaml
-        echo "$(find ~/.local/bin/kitten/.stack-work/install -name "kitten*" | xargs dirname)" >> $GITHUB_PATH
+      shell: bash
+    - uses: actions/cache@v3
+      id: cache-stack-work
+      name: Cache .stack-work
+      with:
+        path: ~/.local/bin/kitten/.stack-work
+        key: ${{ runner.os }}-stack-work-${{ hashFiles('~/.local/bin/kitten/stack.yaml') }}-${{ hashFiles('~/.local/bin/kitten/**/*.hs') }}
+        restore-keys: |
+          ${{ runner.os }}-stack-work-
+    - name: Build Kitten
+      if: ${{ steps.cache-stack-work.outputs.cache-hit != 'true' }}
+      env:
+        KITTEN_VERSION: a5301fe24dbb9ea91974abee73ad544156ee4722 # pragma: allowlist secret
+      run: |
+        kitten_path="~/.local/bin/kitten"
+        stack setup --stack-yaml $kitten_path/stack.yaml
+        stack build --stack-yaml $kitten_path/stack.yaml
+      shell: bash
+    - name: Add Kitten to PATH
+      run: echo "$(find ~/.local/bin/kitten/.stack-work/install -name "kitten*" | xargs dirname)" >> $GITHUB_PATH
       shell: bash
