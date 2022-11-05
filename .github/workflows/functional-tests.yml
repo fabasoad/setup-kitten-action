@@ -39,12 +39,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Install tools
-        run: apk --update add bash git curl tar
+        run: apk --update add bash git
         shell: sh
-      - name: Setup Stack
-        env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
-        uses: mstksg/setup-stack@v2
       - name: Setup Kitten
         uses: ./
       - name: Run script

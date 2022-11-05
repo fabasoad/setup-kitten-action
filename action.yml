@@ -17,36 +17,46 @@ runs:
           CLI_NAME=kitten
         fi
         echo "CLI_NAME=$CLI_NAME" >> $GITHUB_OUTPUT
-        result=$(if command -v $CLI_NAME >/dev/null 2>&1; then echo true; else echo false; fi)
-        echo "CLI_INSTALLED=$result" >> $GITHUB_OUTPUT
-      shell: bash
-    - name: Define vars
-      id: vars
-      if: ${{ steps.info.outputs.CLI_INSTALLED == 'false' }}
-      run: |
+        KITTEN_INSTALLED=$(if command -v $CLI_NAME >/dev/null 2>&1; then echo true; else echo false; fi)
+        echo "KITTEN_INSTALLED=$KITTEN_INSTALLED" >> $GITHUB_OUTPUT
+        STACK_INSTALLED=$(if command -v stack >/dev/null 2>&1; then echo true; else echo false; fi)
+        echo "STACK_INSTALLED=$STACK_INSTALLED" >> $GITHUB_OUTPUT
         mkdir -p "$RUNNER_TEMP/kitten"
         echo "KITTEN_PATH=$RUNNER_TEMP/kitten" >> $GITHUB_OUTPUT
+        mkdir -p "$RUNNER_TEMP/stack"
+        echo "STACK_PATH=$RUNNER_TEMP/stack" >> $GITHUB_OUTPUT
       shell: bash
+    - name: Setup Stack (Linux, macOS)
+      if: ${{ steps.info.outputs.STACK_INSTALLED == 'false' && runner.os != 'Windows' }}
+      run: curl -sSL https://get.haskellstack.org/ | sh
+      shell: bash
+    - name: Setup Stack (Windows)
+      if: ${{ steps.info.outputs.STACK_INSTALLED == 'false' && runner.os == 'Windows' }}
+      run: |
+        Invoke-WebRequest -OutFile ${{ steps.info.outputs.STACK_PATH }}/stack.zip -Uri https://get.haskellstack.org/stable/windows-x86_64.zip
+        Expand-Archive ${{ steps.info.outputs.STACK_PATH }}/stack.zip -DestinationPath ${{ steps.info.outputs.STACK_PATH }}
+        Remove-Item ${{ steps.info.outputs.STACK_PATH }}/stack.zip
+      shell: pwsh
     - name: Clone Kitten repository
-      if: ${{ steps.info.outputs.CLI_INSTALLED == 'false' }}
+      if: ${{ steps.info.outputs.KITTEN_INSTALLED == 'false' }}
       env:
         KITTEN_VERSION: a5301fe24dbb9ea91974abee73ad544156ee4722 # pragma: allowlist secret
       run: |
-        git clone https://github.com/evincarofautumn/kitten.git "${{ steps.vars.outputs.KITTEN_PATH }}"
+        git clone https://github.com/evincarofautumn/kitten.git "${{ steps.info.outputs.KITTEN_PATH }}"
         git reset --hard $KITTEN_VERSION
       shell: bash
-      working-directory: ${{ steps.vars.outputs.KITTEN_PATH }}
+      working-directory: ${{ steps.info.outputs.KITTEN_PATH }}
     - name: Build Kitten
-      if: ${{ steps.info.outputs.CLI_INSTALLED == 'false' }}
+      if: ${{ steps.info.outputs.KITTEN_INSTALLED == 'false' }}
       run: |
         stack setup --stack-yaml stack.yaml
         stack build --stack-yaml stack.yaml
       shell: bash
-      working-directory: ${{ steps.vars.outputs.KITTEN_PATH }}
+      working-directory: ${{ steps.info.outputs.KITTEN_PATH }}
     - name: Add Kitten to PATH
-      if: ${{ steps.info.outputs.CLI_INSTALLED == 'false' }}
+      if: ${{ steps.info.outputs.KITTEN_INSTALLED == 'false' }}
       run: |
-        exe_path=$(find "${{ steps.vars.outputs.KITTEN_PATH }}/.stack-work/install" -name "${{ steps.info.outputs.CLI_NAME }}")
+        exe_path=$(find "${{ steps.info.outputs.KITTEN_PATH }}/.stack-work/install" -name "${{ steps.info.outputs.CLI_NAME }}")
         bin_path=$(dirname $exe_path)
         echo "$bin_path" >> $GITHUB_PATH
       shell: bash
