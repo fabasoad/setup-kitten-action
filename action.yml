@@ -20,7 +20,7 @@ runs:
       name: Cache .stack-work
       if: ${{ runner.os != 'Windows' }}
       with:
-        path: .stack-work
+        path: ${{ env.HOME }}/.local/bin/kitten/.stack-work
         key: ${{ runner.os }}-stack-work-${{ hashFiles('stack.yaml') }}-${{ hashFiles('**/*.hs') }}
         restore-keys: |
           ${{ runner.os }}-stack-work-
@@ -38,17 +38,23 @@ runs:
       name: Cache .stack-work
       if: ${{ runner.os == 'Windows' }}
       with:
-        path: .stack-work
+        path: ${{ env.HOME }}/.local/bin/kitten/.stack-work
         key: ${{ runner.os }}-stack-work-${{ hashFiles('stack.yaml') }}-${{ hashFiles('**/*.hs') }}
         restore-keys: |
           ${{ runner.os }}-stack-work-
-    - name: Setup Kitten
+    - name: Build Kitten
       run: |
         kitten_path="$HOME/.local/bin/kitten"
         mkdir -p $kitten_path
         git clone https://github.com/evincarofautumn/kitten.git $kitten_path
         stack setup --stack-yaml $kitten_path/stack.yaml
         stack build --stack-yaml $kitten_path/stack.yaml
-        ls -A $kitten_path/.stack-work/install/7756f339/bin
-        echo "$(find $kitten_path/.stack-work/install -name "kitten*" | xargs dirname)" >> $GITHUB_PATH
       shell: bash
+    - name: Add Kitten to PATH (Linux, macOS)
+      if: ${{ runner.os != 'Windows' }}
+      run: echo "$(find $HOME/.local/bin/kitten/.stack-work/install -name "kitten*" | xargs dirname)" >> $GITHUB_PATH
+      shell: bash
+    - name: Add Kitten to PATH (Windows)
+      if: ${{ runner.os == 'Windows' }}
+      run: Get-ChildItem -Path $env:HOME\.local\bin\kitten\.stack-work\install -Filter kitten.exe -Recurse -ErrorAction SilentlyContinue -Force | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      shell: pwsh
