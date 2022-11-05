@@ -22,21 +22,15 @@ runs:
         git reset --hard $KITTEN_VERSION
       shell: bash
       working-directory: ${{ steps.vars.outputs.KITTEN_PATH }}
-    - name: Cache .stack-work
-      uses: actions/cache@v3
-      id: cache-stack-work
-      with:
-        path: ${{ steps.vars.outputs.KITTEN_PATH }}/.stack-work
-        key: ${{ runner.os }}-stack-work-${{ hashFiles('${{ steps.vars.outputs.KITTEN_PATH }}/stack.yaml') }}-${{ hashFiles('${{ steps.vars.outputs.KITTEN_PATH }}/**/*.hs') }}
-        restore-keys: |
-          ${{ runner.os }}-stack-work-
     - name: Build Kitten
-      if: ${{ steps.cache-stack-work.outputs.cache-hit != 'true' }}
       run: |
         stack setup --stack-yaml stack.yaml
         stack build --stack-yaml stack.yaml
       shell: bash
       working-directory: ${{ steps.vars.outputs.KITTEN_PATH }}
     - name: Add Kitten to PATH
-      run: find "${{ steps.vars.outputs.KITTEN_PATH }}/.stack-work/install" -name "kitten*" | xargs dirname >> $GITHUB_PATH
+      run: |
+        bin_path=$(find "${{ steps.vars.outputs.KITTEN_PATH }}/.stack-work/install" -name "kitten*" | xargs dirname)
+        echo "Executable file has been found at $bin_path"
+        echo "$bin_path" >> $GITHUB_PATH
       shell: bash
