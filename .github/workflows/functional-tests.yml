@@ -39,7 +39,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Install tools
-        run: apk add bash
+        run: apk add bash git
         shell: sh
       - name: Setup Kitten
         uses: ./
