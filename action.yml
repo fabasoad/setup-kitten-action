@@ -8,13 +8,27 @@ branding:
 runs:
   using: 'composite'
   steps:
+    - name: Collect info
+      id: info
+      run: |
+        if [[ "${{ runner.os }}" == "Windows" ]]; then
+          CLI_NAME=kitten.exe
+        else
+          CLI_NAME=kitten
+        fi
+        echo "CLI_NAME=$CLI_NAME" >> $GITHUB_OUTPUT
+        result=$(if command -v $CLI_NAME >/dev/null 2>&1; then echo true; else echo false; fi)
+        echo "CLI_INSTALLED=$result" >> $GITHUB_OUTPUT
+      shell: bash
     - name: Define vars
       id: vars
+      if: ${{ steps.info.outputs.CLI_INSTALLED == 'false' }}
       run: |
         mkdir -p "$RUNNER_TEMP/kitten"
         echo "KITTEN_PATH=$RUNNER_TEMP/kitten" >> $GITHUB_OUTPUT
       shell: bash
     - name: Clone Kitten repository
+      if: ${{ steps.info.outputs.CLI_INSTALLED == 'false' }}
       env:
         KITTEN_VERSION: a5301fe24dbb9ea91974abee73ad544156ee4722 # pragma: allowlist secret
       run: |
@@ -23,16 +37,16 @@ runs:
       shell: bash
       working-directory: ${{ steps.vars.outputs.KITTEN_PATH }}
     - name: Build Kitten
+      if: ${{ steps.info.outputs.CLI_INSTALLED == 'false' }}
       run: |
         stack setup --stack-yaml stack.yaml
         stack build --stack-yaml stack.yaml
       shell: bash
       working-directory: ${{ steps.vars.outputs.KITTEN_PATH }}
     - name: Add Kitten to PATH
+      if: ${{ steps.info.outputs.CLI_INSTALLED == 'false' }}
       run: |
-        p=$(find "${{ steps.vars.outputs.KITTEN_PATH }}/.stack-work/install" -name "kitten*")
-        echo "Executable file has been found at $p"
-        bin_path=$(dirname $p)
-        echo "Parent folder of Executable file is $bin_path"
+        exe_path=$(find "${{ steps.vars.outputs.KITTEN_PATH }}/.stack-work/install" -name "${{ steps.info.outputs.CLI_NAME }}")
+        bin_path=$(dirname $exe_path)
         echo "$bin_path" >> $GITHUB_PATH
       shell: bash
