@@ -8,31 +8,35 @@ branding:
 runs:
   using: 'composite'
   steps:
+    - name: Define vars
+      id: vars
+      run: |
+        mkdir -p $RUNNER_TEMP/kitten
+        echo "KITTEN_PATH=$RUNNER_TEMP/kitten" >> $GITHUB_OUTPUT
+      shell: bash
     - name: Clone Kitten repository
       env:
         KITTEN_VERSION: a5301fe24dbb9ea91974abee73ad544156ee4722 # pragma: allowlist secret
       run: |
-        kitten_path="$RUNNER_TEMP/kitten"
-        mkdir -p $kitten_path
-        git clone https://github.com/evincarofautumn/kitten.git $kitten_path
-        cd $kitten_path
+        git clone https://github.com/evincarofautumn/kitten.git ${{ steps.vars.outputs.KITTEN_PATH }}
         git reset --hard $KITTEN_VERSION
       shell: bash
-    - uses: actions/cache@v3
+      working-directory: ${{ steps.vars.outputs.KITTEN_PATH }}
+    - name: Cache .stack-work
+      uses: actions/cache@v3
       id: cache-stack-work
-      name: Cache .stack-work
       with:
-        path: ${{ env.RUNNER_TEMP }}/kitten/.stack-work
-        key: ${{ runner.os }}-stack-work-${{ hashFiles('${{ env.RUNNER_TEMP }}/kitten/stack.yaml') }}-${{ hashFiles('${{ env.RUNNER_TEMP }}/kitten/**/*.hs') }}
+        path: ${{ steps.vars.outputs.KITTEN_PATH }}/.stack-work
+        key: ${{ runner.os }}-stack-work-${{ hashFiles('${{ steps.vars.outputs.KITTEN_PATH }}/stack.yaml') }}-${{ hashFiles('${{ steps.vars.outputs.KITTEN_PATH }}/**/*.hs') }}
         restore-keys: |
           ${{ runner.os }}-stack-work-
     - name: Build Kitten
       if: ${{ steps.cache-stack-work.outputs.cache-hit != 'true' }}
       run: |
-        kitten_path="$RUNNER_TEMP/kitten"
-        stack setup --stack-yaml $kitten_path/stack.yaml
-        stack build --stack-yaml $kitten_path/stack.yaml
+        stack setup --stack-yaml stack.yaml
+        stack build --stack-yaml stack.yaml
       shell: bash
+      working-directory: ${{ steps.vars.outputs.KITTEN_PATH }}
     - name: Add Kitten to PATH
-      run: echo "$(find $RUNNER_TEMP/kitten/.stack-work/install -name "kitten*" | xargs dirname)" >> $GITHUB_PATH
+      run: echo "$(find ${{ steps.vars.outputs.KITTEN_PATH }}/.stack-work/install -name "kitten*" | xargs dirname)" >> $GITHUB_PATH
       shell: bash
