@@ -6,6 +6,11 @@
 
 This action sets up a [Kitten](http://kittenlang.org/).
 
+## Prerequisites
+
+The following tools have to be installed for successful work of this GitHub action:
+[bash](https://www.gnu.org/software/bash), [git](https://git-scm.com), [stack](https://docs.haskellstack.org/en/stable).
+
 ## Example usage
 
 Let's try to run `hello-world.ktn` file with the following content:
