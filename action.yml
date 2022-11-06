@@ -37,18 +37,13 @@ runs:
       if: ${{ steps.info.outputs.STACK_INSTALLED == 'false' && runner.os != 'Windows' }}
       run: |
         wget -c https://get.haskellstack.org/stable/${{ steps.info.outputs.BINARY_NAME }}-x86_64.tar.gz -O - | tar -xz
+        ls -A
         exe_path=$(find . -name "stack*")
         stack_path=$(dirname "$exe_path")
         chmod +x "exe_path"
         echo "$stack_path" >> $GITHUB_PATH
       shell: bash
-#    - name: Setup Stack (Windows)
-#      if: ${{ steps.info.outputs.STACK_INSTALLED == 'false' && runner.os == 'Windows' }}
-#      run: |
-#        Invoke-WebRequest -OutFile ${{ steps.info.outputs.STACK_PATH }}/stack.zip -Uri https://get.haskellstack.org/stable/windows-x86_64.zip
-#        Expand-Archive ${{ steps.info.outputs.STACK_PATH }}/stack.zip -DestinationPath ${{ steps.info.outputs.STACK_PATH }}
-#        Remove-Item ${{ steps.info.outputs.STACK_PATH }}/stack.zip
-#      shell: pwsh
+      working-directory: ${{ steps.info.outputs.STACK_PATH }}
     - name: Clone Kitten repository
       if: ${{ steps.info.outputs.KITTEN_INSTALLED == 'false' }}
       env:
