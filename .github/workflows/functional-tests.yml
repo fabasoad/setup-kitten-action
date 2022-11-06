@@ -44,7 +44,5 @@ jobs:
       - name: Setup Kitten
         uses: ./
       - name: Run script
-        run: |
-          echo $PATH
-          kitten ./hello-world.ktn
+        run: kitten ./hello-world.ktn
         shell: bash

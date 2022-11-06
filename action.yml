@@ -27,9 +27,9 @@ runs:
         echo "KITTEN_EXEC_NAME=$KITTEN_EXEC_NAME" >> $GITHUB_OUTPUT
         echo "STACK_EXEC_NAME=$STACK_EXEC_NAME" >> $GITHUB_OUTPUT
         echo "BINARY_NAME=$BINARY_NAME" >> $GITHUB_OUTPUT
-        KITTEN_INSTALLED=$(if command -v $CLI_NAME >/dev/null 2>&1; then echo true; else echo false; fi)
+        KITTEN_INSTALLED=$(if command -v $KITTEN_EXEC_NAME >/dev/null 2>&1; then echo true; else echo false; fi)
         echo "KITTEN_INSTALLED=$KITTEN_INSTALLED" >> $GITHUB_OUTPUT
-        STACK_INSTALLED=$(if command -v stack >/dev/null 2>&1; then echo true; else echo false; fi)
+        STACK_INSTALLED=$(if command -v $STACK_EXEC_NAME >/dev/null 2>&1; then echo true; else echo false; fi)
         echo "STACK_INSTALLED=$STACK_INSTALLED" >> $GITHUB_OUTPUT
         mkdir -p "$RUNNER_TEMP/kitten"
         echo "KITTEN_PATH=$RUNNER_TEMP/kitten" >> $GITHUB_OUTPUT
@@ -40,7 +40,6 @@ runs:
       if: ${{ steps.info.outputs.STACK_INSTALLED == 'false' && runner.os != 'Windows' }}
       run: |
         wget -c https://get.haskellstack.org/stable/${{ steps.info.outputs.BINARY_NAME }}-x86_64.tar.gz -O - | tar -xz --strip-components 1
-        ls -A
         chmod +x "${{ steps.info.outputs.STACK_EXEC_NAME }}"
         echo "$(pwd)" >> $GITHUB_PATH
       shell: bash
