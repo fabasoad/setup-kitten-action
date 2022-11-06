@@ -37,7 +37,7 @@ runs:
         echo "STACK_PATH=$RUNNER_TEMP/stack" >> $GITHUB_OUTPUT
       shell: bash
     - name: Setup Stack
-      if: ${{ steps.info.outputs.STACK_INSTALLED == 'false' && runner.os != 'Windows' }}
+      if: ${{ steps.info.outputs.STACK_INSTALLED == 'false' }}
       run: |
         wget -c https://get.haskellstack.org/stable/${{ steps.info.outputs.BINARY_NAME }}-x86_64.tar.gz -O - | tar -xz --strip-components 1
         chmod +x "${{ steps.info.outputs.STACK_EXEC_NAME }}"
@@ -54,6 +54,7 @@ runs:
       shell: bash
       working-directory: ${{ steps.info.outputs.KITTEN_PATH }}
     - name: Permissions bug workaround
+      if: ${{ steps.info.outputs.STACK_INSTALLED == 'false' }}
       run: chown -R $(id -un):$(id -gn) ~
       shell: bash
     - name: Build Kitten
