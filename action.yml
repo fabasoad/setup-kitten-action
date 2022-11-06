@@ -12,17 +12,20 @@ runs:
       id: info
       run: |
         if [[ "${{ runner.os }}" == "Windows" ]]; then
-          CLI_NAME=kitten.exe
+          KITTEN_EXEC_NAME=kitten.exe
+          STACK_EXEC_NAME=stack.exe
           BINARY_NAME=windows
         else
-          CLI_NAME=kitten
+          KITTEN_EXEC_NAME=kitten
+          STACK_EXEC_NAME=stack
           if [[ "${{ runner.os }}" == "Linux" ]]; then
             BINARY_NAME=linux
           else
             BINARY_NAME=osx
           fi
         fi
-        echo "CLI_NAME=$CLI_NAME" >> $GITHUB_OUTPUT
+        echo "KITTEN_EXEC_NAME=$KITTEN_EXEC_NAME" >> $GITHUB_OUTPUT
+        echo "STACK_EXEC_NAME=$STACK_EXEC_NAME" >> $GITHUB_OUTPUT
         echo "BINARY_NAME=$BINARY_NAME" >> $GITHUB_OUTPUT
         KITTEN_INSTALLED=$(if command -v $CLI_NAME >/dev/null 2>&1; then echo true; else echo false; fi)
         echo "KITTEN_INSTALLED=$KITTEN_INSTALLED" >> $GITHUB_OUTPUT
@@ -38,7 +41,7 @@ runs:
       run: |
         wget -c https://get.haskellstack.org/stable/${{ steps.info.outputs.BINARY_NAME }}-x86_64.tar.gz -O - | tar -xz
         ls -A ./stack-2.9.1-linux-x86_64
-        exe_path=$(find . -name "stack*")
+        exe_path=$(find . -name "${{ steps.info.outputs.STACK_EXEC_NAME }}")
         stack_path=$(dirname "$exe_path")
         chmod +x "exe_path"
         echo "$stack_path" >> $GITHUB_PATH
@@ -63,7 +66,7 @@ runs:
     - name: Add Kitten to PATH
       if: ${{ steps.info.outputs.KITTEN_INSTALLED == 'false' }}
       run: |
-        exe_path=$(find "${{ steps.info.outputs.KITTEN_PATH }}/.stack-work/install" -name "${{ steps.info.outputs.CLI_NAME }}")
+        exe_path=$(find "${{ steps.info.outputs.KITTEN_PATH }}/.stack-work/install" -name "${{ steps.info.outputs.KITTEN_EXEC_NAME }}")
         bin_path=$(dirname $exe_path)
         echo "$bin_path" >> $GITHUB_PATH
       shell: bash
