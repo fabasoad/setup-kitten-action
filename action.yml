@@ -55,6 +55,8 @@ runs:
       working-directory: ${{ steps.info.outputs.KITTEN_PATH }}
     - name: Build Kitten
       if: ${{ steps.info.outputs.KITTEN_INSTALLED == 'false' }}
+      env:
+        TAR_OPTIONS: --no-same-owner
       run: |
         stack setup --stack-yaml stack.yaml
         stack build --stack-yaml stack.yaml
