@@ -61,7 +61,7 @@ runs:
       if: ${{ steps.info.outputs.KITTEN_INSTALLED == 'false' }}
       run: |
         stack setup --stack-yaml stack.yaml
-        stack build --stack-yaml stack.yaml
+        stack build --no-install-ghc --skip-ghc-check --stack-yaml stack.yaml
       shell: bash
       working-directory: ${{ steps.info.outputs.KITTEN_PATH }}
     - name: Add Kitten to PATH
