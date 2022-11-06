@@ -13,37 +13,15 @@ runs:
       run: |
         if [[ "${{ runner.os }}" == "Windows" ]]; then
           KITTEN_EXEC_NAME=kitten.exe
-          STACK_EXEC_NAME=stack.exe
-          BINARY_NAME=windows
         else
           KITTEN_EXEC_NAME=kitten
-          STACK_EXEC_NAME=stack
-          if [[ "${{ runner.os }}" == "Linux" ]]; then
-            BINARY_NAME=linux
-          else
-            BINARY_NAME=osx
-          fi
         fi
         echo "KITTEN_EXEC_NAME=$KITTEN_EXEC_NAME" >> $GITHUB_OUTPUT
-        echo "STACK_EXEC_NAME=$STACK_EXEC_NAME" >> $GITHUB_OUTPUT
-        echo "BINARY_NAME=$BINARY_NAME" >> $GITHUB_OUTPUT
         KITTEN_INSTALLED=$(if command -v $KITTEN_EXEC_NAME >/dev/null 2>&1; then echo true; else echo false; fi)
         echo "KITTEN_INSTALLED=$KITTEN_INSTALLED" >> $GITHUB_OUTPUT
-        STACK_INSTALLED=$(if command -v $STACK_EXEC_NAME >/dev/null 2>&1; then echo true; else echo false; fi)
-        echo "STACK_INSTALLED=$STACK_INSTALLED" >> $GITHUB_OUTPUT
         mkdir -p "$RUNNER_TEMP/kitten"
         echo "KITTEN_PATH=$RUNNER_TEMP/kitten" >> $GITHUB_OUTPUT
-        mkdir -p "$RUNNER_TEMP/stack"
-        echo "STACK_PATH=$RUNNER_TEMP/stack" >> $GITHUB_OUTPUT
       shell: bash
-    - name: Setup Stack
-      if: ${{ steps.info.outputs.STACK_INSTALLED == 'false' }}
-      run: |
-        wget -c https://get.haskellstack.org/stable/${{ steps.info.outputs.BINARY_NAME }}-x86_64.tar.gz -O - | tar -xz --strip-components 1
-        chmod +x "${{ steps.info.outputs.STACK_EXEC_NAME }}"
-        echo "$(pwd)" >> $GITHUB_PATH
-      shell: bash
-      working-directory: ${{ steps.info.outputs.STACK_PATH }}
     - name: Clone Kitten repository
       if: ${{ steps.info.outputs.KITTEN_INSTALLED == 'false' }}
       env:
@@ -53,15 +31,11 @@ runs:
         git reset --hard $KITTEN_VERSION
       shell: bash
       working-directory: ${{ steps.info.outputs.KITTEN_PATH }}
-    - name: Permissions bug workaround
-      if: ${{ steps.info.outputs.STACK_INSTALLED == 'false' }}
-      run: chown -R $(id -un):$(id -gn) ~
-      shell: bash
     - name: Build Kitten
       if: ${{ steps.info.outputs.KITTEN_INSTALLED == 'false' }}
       run: |
         stack setup --stack-yaml stack.yaml
-        stack build --system-ghc --stack-yaml stack.yaml
+        stack build --stack-yaml stack.yaml
       shell: bash
       working-directory: ${{ steps.info.outputs.KITTEN_PATH }}
     - name: Add Kitten to PATH

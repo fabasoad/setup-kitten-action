@@ -30,19 +30,3 @@ jobs:
         if: ${{ matrix.os == 'windows-latest' }}
         run: kitten.exe ./hello-world.ktn
         shell: pwsh
-  run-script-alpine:
-    name: Run script (alpine-latest)
-    timeout-minutes: 20
-    runs-on: ubuntu-latest
-    container:
-      image: alpine:latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Install tools
-        run: apk --update add bash git
-        shell: sh
-      - name: Setup Kitten
-        uses: ./
-      - name: Run script
-        run: kitten ./hello-world.ktn
-        shell: bash
