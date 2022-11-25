@@ -5,8 +5,7 @@ on:
   push:
     branches:
       - 'main'
-      - 'fix-*'
-      - 'feature-*'
+  pull_request:
 
 jobs:
   run-script:
@@ -24,7 +23,7 @@ jobs:
       - name: Run script (Linux, macOS)
         if: ${{ matrix.os != 'windows-latest' }}
         run: kitten ./hello-world.ktn
-        shell: bash
+        shell: sh
       - name: Run script (Windows)
         if: ${{ matrix.os == 'windows-latest' }}
         run: kitten.exe ./hello-world.ktn
