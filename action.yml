@@ -28,11 +28,13 @@ runs:
       run: |
         git clone https://github.com/evincarofautumn/kitten.git "${{ steps.info.outputs.KITTEN_PATH }}"
         git reset --hard $KITTEN_VERSION
+        yq e -i '.resolver = "lts-19.17"' stack.yaml
       shell: sh
       working-directory: ${{ steps.info.outputs.KITTEN_PATH }}
     - name: Build Kitten
       if: ${{ steps.info.outputs.KITTEN_INSTALLED == 'false' }}
       run: |
+        cat stack.yaml
         stack setup --stack-yaml stack.yaml
         stack build --stack-yaml stack.yaml
       shell: sh
