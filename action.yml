@@ -30,11 +30,10 @@ runs:
         git reset --hard $KITTEN_VERSION
       shell: sh
       working-directory: ${{ steps.info.outputs.KITTEN_PATH }}
-    - name: Fix resolver  # workaround until it's fixed in upstream
-      run: |
-        yq e -i '.resolver = "lts-19.17"' stack.yaml
-        cat stack.yaml
+    - name: Fix resolver  # https://github.com/evincarofautumn/kitten/pull/222
+      run: yq e -i '.resolver = "lts-19.17"' stack.yaml
       shell: sh
+      working-directory: ${{ steps.info.outputs.KITTEN_PATH }}
     - name: Build Kitten
       if: ${{ steps.info.outputs.KITTEN_INSTALLED == 'false' }}
       run: |
