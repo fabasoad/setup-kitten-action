@@ -8,6 +8,10 @@ on:  # yamllint disable-line rule:truthy
       - 'fix/ci'
   pull_request:
 
+defaults:
+  run:
+    shell: sh
+
 jobs:
   run-script:
     name: Run script
@@ -20,8 +24,9 @@ jobs:
     runs-on: ${{ matrix.os }}-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Print versions
+        run: stack --version
       - name: Setup Kitten
         uses: ./
       - name: Run script
         run: kitten ./hello-world.ktn
-        shell: sh
