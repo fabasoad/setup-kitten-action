@@ -30,6 +30,10 @@ runs:
         git reset --hard $KITTEN_VERSION
       shell: sh
       working-directory: ${{ steps.info.outputs.KITTEN_PATH }}
+    - name: Setup yq  # for the workaround step below
+      uses: frenck/action-setup-yq@v1
+      with:
+        version: latest
     - name: Fix resolver  # https://github.com/evincarofautumn/kitten/pull/222
       run: yq e -i '.resolver = "lts-19.17"' stack.yaml
       shell: sh
