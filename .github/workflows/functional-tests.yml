@@ -7,6 +7,10 @@ on:  # yamllint disable-line rule:truthy
       - 'main'
   pull_request:
 
+defaults:
+  run:
+    shell: sh
+
 jobs:
   run-script:
     name: Run script
@@ -22,4 +26,3 @@ jobs:
         uses: ./
       - name: Run script
         run: kitten ./hello-world.ktn
-        shell: sh
