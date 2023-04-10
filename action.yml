@@ -24,18 +24,10 @@ runs:
     - name: Clone Kitten repository
       if: ${{ steps.info.outputs.KITTEN_INSTALLED == 'false' }}
       env:
-        KITTEN_VERSION: a5301fe24dbb9ea91974abee73ad544156ee4722  # pragma: allowlist secret
+        KITTEN_VERSION: 2bbc264d7f05c4a7d7b35d06773d1ab2f0623193  # pragma: allowlist secret
       run: |
         git clone https://github.com/evincarofautumn/kitten.git "${{ steps.info.outputs.KITTEN_PATH }}"
         git reset --hard $KITTEN_VERSION
-      shell: sh
-      working-directory: ${{ steps.info.outputs.KITTEN_PATH }}
-    - name: Setup yq  # for the workaround step below
-      uses: frenck/action-setup-yq@v1
-      with:
-        version: latest
-    - name: Fix resolver  # https://github.com/evincarofautumn/kitten/pull/222
-      run: yq e -i '.resolver = "lts-19.17"' stack.yaml
       shell: sh
       working-directory: ${{ steps.info.outputs.KITTEN_PATH }}
     - name: Build Kitten
