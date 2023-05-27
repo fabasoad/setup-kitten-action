@@ -1,12 +1,12 @@
 ---
-name: 'Setup Kitten'
+name: "Setup Kitten"
 author: Yevhen Fabizhevskyi
-description: 'This action sets up a Kitten.'
+description: "This action sets up a Kitten."
 branding:
   icon: terminal
   color: gray-dark
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     - name: Collect info
       id: info
@@ -24,7 +24,7 @@ runs:
     - name: Clone Kitten repository
       if: ${{ steps.info.outputs.KITTEN_INSTALLED == 'false' }}
       env:
-        KITTEN_VERSION: 2bbc264d7f05c4a7d7b35d06773d1ab2f0623193  # pragma: allowlist secret
+        KITTEN_VERSION: 2bbc264d7f05c4a7d7b35d06773d1ab2f0623193 # pragma: allowlist secret
       run: |
         git clone https://github.com/evincarofautumn/kitten.git "${{ steps.info.outputs.KITTEN_PATH }}"
         git reset --hard $KITTEN_VERSION
