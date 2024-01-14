@@ -12,14 +12,14 @@ runs:
       id: info
       run: |
         KITTEN_EXEC_NAME=kitten
-        if [ "${{ runner.os }}" = "Windows" ]; then
+        if [ "${RUNNER_OS}" = "Windows" ]; then
           KITTEN_EXEC_NAME="$KITTEN_EXEC_NAME.exe"
         fi
-        echo "KITTEN_EXEC_NAME=$KITTEN_EXEC_NAME" >> $GITHUB_OUTPUT
+        echo "KITTEN_EXEC_NAME=$KITTEN_EXEC_NAME" >> "$GITHUB_OUTPUT"
         KITTEN_INSTALLED=$(if command -v $KITTEN_EXEC_NAME >/dev/null 2>&1; then echo true; else echo false; fi)
-        echo "KITTEN_INSTALLED=$KITTEN_INSTALLED" >> $GITHUB_OUTPUT
+        echo "KITTEN_INSTALLED=$KITTEN_INSTALLED" >> "$GITHUB_OUTPUT"
         mkdir -p "$RUNNER_TEMP/kitten"
-        echo "KITTEN_PATH=$RUNNER_TEMP/kitten" >> $GITHUB_OUTPUT
+        echo "KITTEN_PATH=$RUNNER_TEMP/kitten" >> "$GITHUB_OUTPUT"
       shell: sh
     - name: Clone Kitten repository
       if: ${{ steps.info.outputs.KITTEN_INSTALLED == 'false' }}
@@ -42,5 +42,5 @@ runs:
       run: |
         exe_path=$(find "${{ steps.info.outputs.KITTEN_PATH }}/.stack-work/install" -name "${{ steps.info.outputs.KITTEN_EXEC_NAME }}")
         bin_path=$(dirname $exe_path)
-        echo "$bin_path" >> $GITHUB_PATH
+        echo "$bin_path" >> "$GITHUB_PATH"
       shell: sh
