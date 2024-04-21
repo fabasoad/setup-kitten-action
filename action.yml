@@ -13,13 +13,13 @@ runs:
       run: |
         KITTEN_EXEC_NAME=kitten
         if [ "${RUNNER_OS}" = "Windows" ]; then
-          KITTEN_EXEC_NAME="$KITTEN_EXEC_NAME.exe"
+          KITTEN_EXEC_NAME="${KITTEN_EXEC_NAME}.exe"
         fi
-        echo "KITTEN_EXEC_NAME=$KITTEN_EXEC_NAME" >> "$GITHUB_OUTPUT"
-        KITTEN_INSTALLED=$(if command -v $KITTEN_EXEC_NAME >/dev/null 2>&1; then echo true; else echo false; fi)
+        echo "KITTEN_EXEC_NAME=${KITTEN_EXEC_NAME}" >> "$GITHUB_OUTPUT"
+        KITTEN_INSTALLED=$(if command -v "${KITTEN_EXEC_NAME}" >/dev/null 2>&1; then echo true; else echo false; fi)
         echo "KITTEN_INSTALLED=$KITTEN_INSTALLED" >> "$GITHUB_OUTPUT"
         mkdir -p "$RUNNER_TEMP/kitten"
-        echo "KITTEN_PATH=$RUNNER_TEMP/kitten" >> "$GITHUB_OUTPUT"
+        echo "KITTEN_PATH=${RUNNER_TEMP}/kitten" >> "$GITHUB_OUTPUT"
       shell: sh
     - name: Clone Kitten repository
       if: ${{ steps.info.outputs.KITTEN_INSTALLED == 'false' }}
@@ -27,7 +27,7 @@ runs:
         KITTEN_VERSION: 2bbc264d7f05c4a7d7b35d06773d1ab2f0623193 # pragma: allowlist secret
       run: |
         git clone https://github.com/evincarofautumn/kitten.git "${{ steps.info.outputs.KITTEN_PATH }}"
-        git reset --hard $KITTEN_VERSION
+        git reset --hard "${KITTEN_VERSION}"
       shell: sh
       working-directory: ${{ steps.info.outputs.KITTEN_PATH }}
     - name: Build Kitten
@@ -41,6 +41,6 @@ runs:
       if: ${{ steps.info.outputs.KITTEN_INSTALLED == 'false' }}
       run: |
         exe_path=$(find "${{ steps.info.outputs.KITTEN_PATH }}/.stack-work/install" -name "${{ steps.info.outputs.KITTEN_EXEC_NAME }}")
-        bin_path=$(dirname $exe_path)
-        echo "$bin_path" >> "$GITHUB_PATH"
+        bin_path=$(dirname "${exe_path}")
+        echo "${bin_path}" >> "$GITHUB_PATH"
       shell: sh
