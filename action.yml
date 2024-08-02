@@ -25,7 +25,11 @@ runs:
       shell: sh
     - name: Setup Stack
       if: ${{ steps.info.outputs.stack-installed == 'false' }}
-      run: curl -sSL https://get.haskellstack.org/ | sh
+      run: |
+        if [ "${RUNNER_OS}" = "macOS" ]; then
+          brew install llvm
+        fi
+        curl -sSL https://get.haskellstack.org/ | sh
       shell: sh
     - name: Clone Kitten repository
       if: ${{ steps.info.outputs.kitten-installed == 'false' }}
