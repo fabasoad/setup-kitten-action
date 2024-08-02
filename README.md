@@ -10,8 +10,9 @@ This action sets up a [Kitten](http://kittenlang.org/).
 
 ## Prerequisites
 
-The following tools have to be installed for successful work of this GitHub action:
-[git](https://git-scm.com), [stack](https://docs.haskellstack.org/en/stable).
+None.
+
+> `macOS` is not supported at this moment
 
 ## Example usage
 
