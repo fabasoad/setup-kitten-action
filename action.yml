@@ -29,8 +29,10 @@ runs:
         if [ "${RUNNER_OS}" = "macOS" ]; then
           brew install llvm@12
           echo "/opt/homebrew/opt/llvm@12/bin" >> "$GITHUB_PATH"
+          brew install haskell-stack
+        else
+          curl -sSL https://get.haskellstack.org/ | sh
         fi
-        curl -sSL https://get.haskellstack.org/ | sh
       shell: sh
     - name: Clone Kitten repository
       if: ${{ steps.info.outputs.kitten-installed == 'false' }}
