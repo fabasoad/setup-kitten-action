@@ -20,8 +20,6 @@ runs:
         echo "kitten-installed=${kitten_installed}" >> "$GITHUB_OUTPUT"
         stack_installed=$(if command -v stack >/dev/null 2>&1; then echo true; else echo false; fi)
         echo "stack-installed=${stack_installed}" >> "$GITHUB_OUTPUT"
-        mkdir -p "${RUNNER_TEMP}/kitten"
-        echo "kitten-path=${RUNNER_TEMP}/kitten" >> "$GITHUB_OUTPUT"
       shell: sh
     - name: Setup Stack
       if: ${{ steps.info.outputs.stack-installed == 'false' }}
@@ -29,31 +27,28 @@ runs:
         if [ "${RUNNER_OS}" = "macOS" ]; then
           brew install llvm@12
           echo "/opt/homebrew/opt/llvm@12/bin" >> "$GITHUB_PATH"
-          brew install haskell-stack
-        else
-          curl -sSL https://get.haskellstack.org/ | sh
         fi
+        curl -sSL https://get.haskellstack.org/ | sh
       shell: sh
     - name: Clone Kitten repository
       if: ${{ steps.info.outputs.kitten-installed == 'false' }}
-      env:
-        KITTEN_VERSION: 2bbc264d7f05c4a7d7b35d06773d1ab2f0623193 # pragma: allowlist secret
-      run: |
-        git clone https://github.com/evincarofautumn/kitten.git "${{ steps.info.outputs.kitten-path }}"
-        git reset --hard "${KITTEN_VERSION}"
-      shell: sh
-      working-directory: ${{ steps.info.outputs.kitten-path }}
+      uses: actions/checkout@v4
+      with:
+        repository: "evincarofautumn/kitten"
+        ref: "2bbc264d7f05c4a7d7b35d06773d1ab2f0623193" # pragma: allowlist secret
+        path: "kitten-repo"
     - name: Build Kitten
       if: ${{ steps.info.outputs.kitten-installed == 'false' }}
       run: |
+        stack --version
         stack setup --stack-yaml stack.yaml
         stack build --stack-yaml stack.yaml
       shell: sh
-      working-directory: ${{ steps.info.outputs.kitten-path }}
+      working-directory: kitten-repo
     - name: Add Kitten to PATH
       if: ${{ steps.info.outputs.kitten-installed == 'false' }}
       run: |
-        exe_path=$(find "${{ steps.info.outputs.kitten-path }}/.stack-work/install" -name "${{ steps.info.outputs.kitten-exec-name }}")
+        exe_path=$(find "${GITHUB_WORKSPACE}/kitten-repo/.stack-work/install" -name "${{ steps.info.outputs.kitten-exec-name }}")
         bin_path=$(dirname "${exe_path}")
         echo "${bin_path}" >> "$GITHUB_PATH"
       shell: sh
