@@ -11,36 +11,42 @@ runs:
     - name: Collect info
       id: info
       run: |
-        KITTEN_EXEC_NAME=kitten
+        kitten_exec_name=kitten
         if [ "${RUNNER_OS}" = "Windows" ]; then
-          KITTEN_EXEC_NAME="${KITTEN_EXEC_NAME}.exe"
+          kitten_exec_name="${kitten_exec_name}.exe"
         fi
-        echo "KITTEN_EXEC_NAME=${KITTEN_EXEC_NAME}" >> "$GITHUB_OUTPUT"
-        KITTEN_INSTALLED=$(if command -v "${KITTEN_EXEC_NAME}" >/dev/null 2>&1; then echo true; else echo false; fi)
-        echo "KITTEN_INSTALLED=$KITTEN_INSTALLED" >> "$GITHUB_OUTPUT"
-        mkdir -p "$RUNNER_TEMP/kitten"
-        echo "KITTEN_PATH=${RUNNER_TEMP}/kitten" >> "$GITHUB_OUTPUT"
+        echo "kitten-exec-name=${kitten_exec_name}" >> "$GITHUB_OUTPUT"
+        kitten_installed=$(if command -v "${kitten_exec_name}" >/dev/null 2>&1; then echo true; else echo false; fi)
+        echo "kitten-installed=${kitten_installed}" >> "$GITHUB_OUTPUT"
+        stack_installed=$(if command -v stack >/dev/null 2>&1; then echo true; else echo false; fi)
+        echo "stack-installed=${stack_installed}" >> "$GITHUB_OUTPUT"
+        mkdir -p "${RUNNER_TEMP}/kitten"
+        echo "kitten-path=${RUNNER_TEMP}/kitten" >> "$GITHUB_OUTPUT"
+      shell: sh
+    - name: Setup Stack
+      if: ${{ steps.info.outputs.stack-installed == 'false' }}
+      run: curl -sSL https://get.haskellstack.org/ | sh
       shell: sh
     - name: Clone Kitten repository
-      if: ${{ steps.info.outputs.KITTEN_INSTALLED == 'false' }}
+      if: ${{ steps.info.outputs.kitten-installed == 'false' }}
       env:
         KITTEN_VERSION: 2bbc264d7f05c4a7d7b35d06773d1ab2f0623193 # pragma: allowlist secret
       run: |
-        git clone https://github.com/evincarofautumn/kitten.git "${{ steps.info.outputs.KITTEN_PATH }}"
+        git clone https://github.com/evincarofautumn/kitten.git "${{ steps.info.outputs.kitten-path }}"
         git reset --hard "${KITTEN_VERSION}"
       shell: sh
-      working-directory: ${{ steps.info.outputs.KITTEN_PATH }}
+      working-directory: ${{ steps.info.outputs.kitten-path }}
     - name: Build Kitten
-      if: ${{ steps.info.outputs.KITTEN_INSTALLED == 'false' }}
+      if: ${{ steps.info.outputs.kitten-installed == 'false' }}
       run: |
         stack setup --stack-yaml stack.yaml
         stack build --stack-yaml stack.yaml
       shell: sh
-      working-directory: ${{ steps.info.outputs.KITTEN_PATH }}
+      working-directory: ${{ steps.info.outputs.kitten-path }}
     - name: Add Kitten to PATH
-      if: ${{ steps.info.outputs.KITTEN_INSTALLED == 'false' }}
+      if: ${{ steps.info.outputs.kitten-installed == 'false' }}
       run: |
-        exe_path=$(find "${{ steps.info.outputs.KITTEN_PATH }}/.stack-work/install" -name "${{ steps.info.outputs.KITTEN_EXEC_NAME }}")
+        exe_path=$(find "${{ steps.info.outputs.kitten-path }}/.stack-work/install" -name "${{ steps.info.outputs.kitten-exec-name }}")
         bin_path=$(dirname "${exe_path}")
         echo "${bin_path}" >> "$GITHUB_PATH"
       shell: sh
