@@ -8,6 +8,10 @@ branding:
 runs:
   using: "composite"
   steps:
+    - name: Fail
+      if: ${{ runner.os == 'macOS' }}
+      run: echo "::error::${RUNNER_OS} ${RUNNER_ARCH} is not supported" && exit 1
+      shell: sh
     - name: Collect info
       id: info
       run: |
@@ -23,12 +27,7 @@ runs:
       shell: sh
     - name: Setup Stack
       if: ${{ steps.info.outputs.stack-installed == 'false' }}
-      run: |
-        if [ "${RUNNER_OS}" = "macOS" ]; then
-          brew install llvm@12
-          echo "/opt/homebrew/opt/llvm@12/bin" >> "$GITHUB_PATH"
-        fi
-        curl -sSL https://get.haskellstack.org/ | sh
+      run: curl -sSL https://get.haskellstack.org/ | sh
       shell: sh
     - name: Clone Kitten repository
       if: ${{ steps.info.outputs.kitten-installed == 'false' }}
@@ -40,7 +39,6 @@ runs:
     - name: Build Kitten
       if: ${{ steps.info.outputs.kitten-installed == 'false' }}
       run: |
-        stack --version
         stack setup --stack-yaml stack.yaml
         stack build --stack-yaml stack.yaml
       shell: sh
