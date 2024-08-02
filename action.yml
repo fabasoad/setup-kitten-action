@@ -30,6 +30,7 @@ runs:
           brew install llvm@12
         fi
         curl -sSL https://get.haskellstack.org/ | sh
+        xcode-select --install
       shell: sh
     - name: Clone Kitten repository
       if: ${{ steps.info.outputs.kitten-installed == 'false' }}
