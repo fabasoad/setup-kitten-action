@@ -27,7 +27,7 @@ runs:
       if: ${{ steps.info.outputs.stack-installed == 'false' }}
       run: |
         if [ "${RUNNER_OS}" = "macOS" ]; then
-          brew install llvm
+          brew install llvm@12
         fi
         curl -sSL https://get.haskellstack.org/ | sh
       shell: sh
