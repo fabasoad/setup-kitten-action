@@ -18,20 +18,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu", "macos", "windows"]
-    runs-on: ${{ matrix.os }}-latest
+        runner: ["ubuntu-latest", "macos-12", "windows-latest"]
+    runs-on: ${{ matrix.runner }}
     steps:
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v4
       - name: Setup Kitten
-        id: setup-kitten
-        continue-on-error: true
         uses: ./
       - name: Run script
-        if: ${{ steps.setup-kitten.outcome == 'success' }}
         run: kitten ./hello-world.ktn
-      - name: Validate outcome
-        run: |
-          if [ "${RUNNER_OS}" != "macOS" ] && [ "${{ steps.setup-kitten.outcome }}" = "failure" ]; then
-            exit 1
-          fi
