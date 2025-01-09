@@ -2,10 +2,18 @@
 name: Functional Tests
 
 on: # yamllint disable-line rule:truthy
-  pull_request: {}
   push:
     branches:
       - main
+  pull_request:
+    paths:
+      - .github/workflows/functional-tests.yml
+      - src/**
+      - action.yml
+  schedule:
+    # Every Friday at 09:00 JST
+    - cron: "0 0 * * 5"
+  workflow_dispatch: {}
 
 defaults:
   run:
@@ -14,12 +22,12 @@ defaults:
 jobs:
   run-script:
     name: Run script
+    runs-on: ${{ matrix.os }}-latest
     timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
-        runner: ["ubuntu-latest", "macos-12", "windows-latest"]
-    runs-on: ${{ matrix.runner }}
+        os: ["ubuntu", "macos", "windows"]
     steps:
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v4
@@ -27,3 +35,36 @@ jobs:
         uses: ./
       - name: Run script
         run: kitten ./hello-world.ktn
+  test-force:
+    name: Test force
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        force: ["true", "false"]
+    steps:
+      - name: Checkout ${{ github.repository }}
+        uses: actions/checkout@v4
+      - name: Setup kitten 1
+        id: setup-kitten-1
+        uses: ./
+      - name: Setup kitten 2
+        id: setup-kitten-2
+        uses: ./
+        with:
+          force: ${{ matrix.force }}
+      - name: Test action completion
+        run: |
+          test_equal() {
+            if [ "${2}" != "${3}" ]; then
+              echo "::error title=${1}::Expected: ${3}. Actual: ${2}."
+              exit 1
+            fi
+          }
+          test_equal "Wrong \"installed\" output from setup-kitten-1" \
+            "${{ steps.setup-kitten-1.outputs.installed }}" \
+            "true"
+          test_equal "Wrong \"installed\" output from setup-kitten-2" \
+            "${{ steps.setup-kitten-2.outputs.installed }}" \
+            "${{ matrix.force }}"

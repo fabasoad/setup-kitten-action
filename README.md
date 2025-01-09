@@ -11,19 +11,34 @@ This action sets up a [Kitten](http://kittenlang.org/).
 ## Supported OS
 
 <!-- prettier-ignore-start -->
-| OS      | Arch   |                    |
-|---------|--------|--------------------|
-| Windows | x86_84 | :white_check_mark: |
-| Windows | arm    | :x:                |
-| Linux   | x86_84 | :white_check_mark: |
-| Linux   | arm    | :x:                |
-| macOS   | x86_84 | :white_check_mark: |
-| macOS   | arm    | :x:                |
+| OS      |                    |
+|---------|--------------------|
+| Windows | :white_check_mark: |
+| Linux   | :white_check_mark: |
+| macOS   | :white_check_mark: |
 <!-- prettier-ignore-end -->
 
 ## Prerequisites
 
 None.
+
+## Inputs
+
+```yaml
+- uses: fabasoad/setup-kitten-action@v1
+  with:
+    # (Optional) If "false" skips installation if kitten is already installed.
+    # If "true" installs kitten in any case. Defaults to "false".
+    force: "false"
+```
+
+## Outputs
+
+<!-- prettier-ignore-start -->
+| Name      | Description                         | Example |
+|-----------|-------------------------------------|---------|
+| installed | Whether kitten was installed or not | `true`  |
+<!-- prettier-ignore-end -->
 
 ## Example usage
 
@@ -45,8 +60,8 @@ jobs:
     name: Setup
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
-      - uses: fabasoad/setup-kitten-action@main
+      - uses: actions/checkout@v4
+      - uses: fabasoad/setup-kitten-action@v1
       - name: Run script
         run: kitten ./hello-world.ktn
 ```
