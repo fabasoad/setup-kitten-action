@@ -11,14 +11,11 @@ This action sets up a [Kitten](http://kittenlang.org/).
 ## Supported OS
 
 <!-- prettier-ignore-start -->
-| OS      | Arch   |                    |
-|---------|--------|--------------------|
-| Windows | x86_84 | :white_check_mark: |
-| Windows | arm    | :x:                |
-| Linux   | x86_84 | :white_check_mark: |
-| Linux   | arm    | :x:                |
-| macOS   | x86_84 | :white_check_mark: |
-| macOS   | arm    | :x:                |
+| OS      |                    |
+|---------|--------------------|
+| Windows | :white_check_mark: |
+| Linux   | :white_check_mark: |
+| macOS   | :white_check_mark: |
 <!-- prettier-ignore-end -->
 
 ## Prerequisites
