@@ -5,44 +5,55 @@ description: "This action sets up a Kitten."
 branding:
   icon: terminal
   color: gray-dark
+inputs:
+  force:
+    description: |
+      If "false" skips installation if kitten is already installed. If "true"
+      installs kitten in any case. Defaults to "false".
+    required: false
+    default: "false"
+outputs:
+  installed:
+    description: Whether kitten was installed or not.
+    value: "${{ steps.install-kitten.outcome == 'success' }}"
 runs:
   using: "composite"
   steps:
     - name: Collect info
       id: info
-      run: |
-        kitten_exec_name=kitten
-        if [ "${RUNNER_OS}" = "Windows" ]; then
-          kitten_exec_name="${kitten_exec_name}.exe"
-        fi
-        echo "kitten-exec-name=${kitten_exec_name}" >> "$GITHUB_OUTPUT"
-        kitten_installed=$(if command -v "${kitten_exec_name}" >/dev/null 2>&1; then echo true; else echo false; fi)
-        echo "kitten-installed=${kitten_installed}" >> "$GITHUB_OUTPUT"
-        stack_installed=$(if command -v stack >/dev/null 2>&1; then echo true; else echo false; fi)
-        echo "stack-installed=${stack_installed}" >> "$GITHUB_OUTPUT"
+      env:
+        INPUT_FORCE: "${{ inputs.force }}"
+      run: ./collect-info.sh "${INPUT_FORCE}"
       shell: sh
+      working-directory: "${{ github.action_path }}/src"
+
     - name: Setup Stack
-      if: ${{ steps.info.outputs.stack-installed == 'false' }}
+      if: ${{ steps.info.outputs.bin-installed == 'false' && steps.info.outputs.stack-installed == 'false' }}
       run: curl -sSL https://get.haskellstack.org/ | sh
       shell: sh
-    - name: Clone Kitten repository
-      if: ${{ steps.info.outputs.kitten-installed == 'false' }}
+
+    - name: Download kitten
+      if: ${{ steps.info.outputs.bin-installed == 'false' }}
       uses: actions/checkout@v4
       with:
         repository: "evincarofautumn/kitten"
         ref: "2bbc264d7f05c4a7d7b35d06773d1ab2f0623193" # pragma: allowlist secret
-        path: "kitten-repo"
-    - name: Build Kitten
-      if: ${{ steps.info.outputs.kitten-installed == 'false' }}
+        path: ${{ steps.info.outputs.bin-dir }}
+
+    - name: Install Kitten
+      if: ${{ steps.info.outputs.bin-installed == 'false' }}
+      id: install-kitten
       run: |
         stack setup --stack-yaml stack.yaml
         stack build --stack-yaml stack.yaml
       shell: sh
-      working-directory: kitten-repo
+      working-directory: ${{ steps.info.outputs.bin-path }}
+
     - name: Add Kitten to PATH
       if: ${{ steps.info.outputs.kitten-installed == 'false' }}
       run: |
-        exe_path=$(find "${GITHUB_WORKSPACE}/kitten-repo/.stack-work/install" -name "${{ steps.info.outputs.kitten-exec-name }}")
+        exe_path=$(find "${{ steps.info.outputs.bin-path }}/.stack-work/install" -name "kitten")
         bin_path=$(dirname "${exe_path}")
+        echo "${bin_path}"
         echo "${bin_path}" >> "$GITHUB_PATH"
       shell: sh
