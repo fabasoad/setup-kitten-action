@@ -27,7 +27,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu", "windows"]
+        os: ["ubuntu", "macos", "windows"]
     steps:
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v4

@@ -25,6 +25,24 @@ This action sets up a [Kitten](http://kittenlang.org/).
 
 None.
 
+## Inputs
+
+```yaml
+- uses: fabasoad/setup-kitten-action@v1
+  with:
+    # (Optional) If "false" skips installation if kitten is already installed.
+    # If "true" installs kitten in any case. Defaults to "false".
+    force: "false"
+```
+
+## Outputs
+
+<!-- prettier-ignore-start -->
+| Name      | Description                         | Example |
+|-----------|-------------------------------------|---------|
+| installed | Whether kitten was installed or not | `true`  |
+<!-- prettier-ignore-end -->
+
 ## Example usage
 
 Let's try to run `hello-world.ktn` file with the following content:
@@ -45,8 +63,8 @@ jobs:
     name: Setup
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
-      - uses: fabasoad/setup-kitten-action@main
+      - uses: actions/checkout@v4
+      - uses: fabasoad/setup-kitten-action@v1
       - name: Run script
         run: kitten ./hello-world.ktn
 ```

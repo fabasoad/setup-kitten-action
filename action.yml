@@ -36,8 +36,10 @@ runs:
       if: ${{ steps.info.outputs.bin-installed == 'false' }}
       uses: actions/checkout@v4
       with:
-        repository: "evincarofautumn/kitten"
-        ref: "2bbc264d7f05c4a7d7b35d06773d1ab2f0623193" # pragma: allowlist secret
+        repository: "fabasoad/kitten"
+        ref: "7c46b5b48152bb75bc1482d0373d682b163bf3e5" # pragma: allowlist secret
+        # repository: "evincarofautumn/kitten"
+        # ref: "2bbc264d7f05c4a7d7b35d06773d1ab2f0623193" # pragma: allowlist secret
         path: ${{ steps.info.outputs.bin-dir }}
 
     - name: Install Kitten
