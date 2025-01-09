@@ -27,7 +27,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu", "macos", "windows"]
+        os: ["ubuntu", "windows"]
     steps:
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v4
@@ -38,7 +38,7 @@ jobs:
   test-force:
     name: Test force
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:

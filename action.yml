@@ -46,14 +46,12 @@ runs:
       run: |
         stack setup --stack-yaml stack.yaml
         stack build --stack-yaml stack.yaml
+        exe_path=$(find ".stack-work/install" -name "kitten${{ runner.os == 'Windows' && '.exe' || '' }}")
+        bin_path=$(dirname "${exe_path}")
+        echo "${bin_path}" >> "$GITHUB_PATH"
       shell: sh
       working-directory: ${{ steps.info.outputs.bin-path }}
 
-    - name: Add Kitten to PATH
-      if: ${{ steps.info.outputs.kitten-installed == 'false' }}
-      run: |
-        exe_path=$(find "${{ steps.info.outputs.bin-path }}/.stack-work/install" -name "kitten")
-        bin_path=$(dirname "${exe_path}")
-        echo "${bin_path}"
-        echo "${bin_path}" >> "$GITHUB_PATH"
+    - name: Print version
+      run: kitten --version
       shell: sh
