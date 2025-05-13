@@ -42,6 +42,13 @@ runs:
         # ref: "2bbc264d7f05c4a7d7b35d06773d1ab2f0623193" # pragma: allowlist secret
         path: ${{ steps.info.outputs.bin-dir }}
 
+    - name: Install missing dependencies
+      if: ${{ runner.os == 'Linux' && steps.info.outputs.bin-installed == 'false' }}
+      run: |
+        sudo apt-get update || true
+        sudo apt-get install libtinfo-dev -y || true
+      shell: sh
+
     - name: Install Kitten
       if: ${{ steps.info.outputs.bin-installed == 'false' }}
       id: install-kitten
