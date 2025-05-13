@@ -46,6 +46,8 @@ runs:
       if: ${{ steps.info.outputs.bin-installed == 'false' }}
       id: install-kitten
       run: |
+        apt-get update
+        apt-get install libtinfo-dev -y
         stack setup --stack-yaml stack.yaml
         stack build --stack-yaml stack.yaml
         exe_path=$(find "$(pwd)/.stack-work/install" -name "kitten${{ runner.os == 'Windows' && '.exe' || '' }}")
