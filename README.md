@@ -72,3 +72,7 @@ jobs:
 Run kitten ./hello-world.ktn
 Hello World!
 ```
+
+## Contributions
+
+![Alt](https://repobeats.axiom.co/api/embed/d29a1ce6b4a8efebe5095819b293cf5887ff9608.svg "Repobeats analytics image")
