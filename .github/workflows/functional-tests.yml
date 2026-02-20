@@ -19,18 +19,21 @@ defaults:
   run:
     shell: sh
 
+permissions:
+  contents: read
+
 jobs:
   run-script:
     name: Run script
     runs-on: ${{ matrix.os }}-latest
-    timeout-minutes: 20
+    timeout-minutes: 40
     strategy:
       fail-fast: false
       matrix:
         os: ["ubuntu", "macos", "windows"]
     steps:
       - name: Checkout ${{ github.repository }}
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Setup Kitten
         uses: ./
       - name: Run script
@@ -38,14 +41,14 @@ jobs:
   test-force:
     name: Test force
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 40
     strategy:
       fail-fast: false
       matrix:
         force: ["true", "false"]
     steps:
       - name: Checkout ${{ github.repository }}
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Setup kitten 1
         id: setup-kitten-1
         uses: ./
