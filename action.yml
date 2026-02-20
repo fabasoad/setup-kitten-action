@@ -34,10 +34,10 @@ runs:
 
     - name: Download kitten
       if: ${{ steps.info.outputs.bin-installed == 'false' }}
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         repository: "fabasoad/kitten"
-        ref: "bca9235e7424bc11c786093f679bff9bd54e93a1" # pragma: allowlist secret
+        ref: "4de80e3e197b0cbc582e8e5ed12518a423869624" # pragma: allowlist secret
         # repository: "evincarofautumn/kitten"
         # ref: "2bbc264d7f05c4a7d7b35d06773d1ab2f0623193" # pragma: allowlist secret
         path: ${{ steps.info.outputs.bin-dir }}

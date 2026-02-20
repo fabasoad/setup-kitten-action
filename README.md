@@ -60,7 +60,7 @@ jobs:
     name: Setup
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: fabasoad/setup-kitten-action@v1
       - name: Run script
         run: kitten ./hello-world.ktn
