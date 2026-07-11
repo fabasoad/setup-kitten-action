@@ -12,6 +12,11 @@ inputs:
       installs kitten in any case. Defaults to "false".
     required: false
     default: "false"
+  github-token:
+    description: |
+      Personal access token (PAT) used to fetch the fabasoad/kitten repository.
+    required: false
+    default: "${{ github.token }}"
 outputs:
   installed:
     description: Whether kitten was installed or not.
@@ -34,13 +39,15 @@ runs:
 
     - name: Download kitten
       if: ${{ steps.info.outputs.bin-installed == 'false' }}
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         repository: "fabasoad/kitten"
-        ref: "4de80e3e197b0cbc582e8e5ed12518a423869624" # pragma: allowlist secret
+        ref: "8227d3cccb78b8ad8413b859d4697be0d7bec068" # pragma: allowlist secret
         # repository: "evincarofautumn/kitten"
         # ref: "2bbc264d7f05c4a7d7b35d06773d1ab2f0623193" # pragma: allowlist secret
         path: ${{ steps.info.outputs.bin-dir }}
+        token: "${{ inputs.github-token }}"
+        persist-credentials: "false"
 
     - name: Install missing dependencies
       if: ${{ runner.os == 'Linux' && steps.info.outputs.bin-installed == 'false' }}
@@ -55,7 +62,7 @@ runs:
       run: |
         stack setup --stack-yaml stack.yaml
         stack build --stack-yaml stack.yaml
-        exe_path=$(find "$(pwd)/.stack-work/install" -name "kitten${{ runner.os == 'Windows' && '.exe' || '' }}")
+        exe_path=$(find "$(pwd)/.stack-work/install" -name "kitten${{ case(runner.os == 'Windows', '.exe', '') }}")
         bin_path=$(dirname "${exe_path}")
         echo "${bin_path}" >> "$GITHUB_PATH"
       shell: sh

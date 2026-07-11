@@ -19,36 +19,55 @@ defaults:
   run:
     shell: sh
 
-permissions:
-  contents: read
-
 jobs:
   run-script:
     name: Run script
     runs-on: ${{ matrix.os }}-latest
     timeout-minutes: 40
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
         os: ["ubuntu", "macos", "windows"]
     steps:
       - name: Checkout ${{ github.repository }}
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: "false"
       - name: Setup Kitten
+        id: setup-kitten
         uses: ./
+      - name: Test action completion
+        env:
+          STEP_SETUP_KITTEN_OUTPUT_INSTALLED: "${{ steps.setup-kitten.outputs.installed }}"
+        run: |
+          test_equal() {
+            if [ "${2}" != "${3}" ]; then
+              echo "::error title=${1}::Expected: ${3}. Actual: ${2}."
+              exit 1
+            fi
+          }
+          test_equal "Wrong \"installed\" output from setup-kitten" \
+            "${STEP_SETUP_KITTEN_OUTPUT_INSTALLED}" \
+            "true"
       - name: Run script
         run: kitten ./hello-world.ktn
   test-force:
     name: Test force
     runs-on: ubuntu-latest
     timeout-minutes: 40
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
         force: ["true", "false"]
     steps:
       - name: Checkout ${{ github.repository }}
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: "false"
       - name: Setup kitten 1
         id: setup-kitten-1
         uses: ./
@@ -58,6 +77,9 @@ jobs:
         with:
           force: ${{ matrix.force }}
       - name: Test action completion
+        env:
+          STEP_SETUP_KITTEN_1_OUTPUT_INSTALLED: "${{ steps.setup-kitten-1.outputs.installed }}"
+          STEP_SETUP_KITTEN_2_OUTPUT_INSTALLED: "${{ steps.setup-kitten-2.outputs.installed }}"
         run: |
           test_equal() {
             if [ "${2}" != "${3}" ]; then
@@ -66,8 +88,8 @@ jobs:
             fi
           }
           test_equal "Wrong \"installed\" output from setup-kitten-1" \
-            "${{ steps.setup-kitten-1.outputs.installed }}" \
+            "${STEP_SETUP_KITTEN_1_OUTPUT_INSTALLED}" \
             "true"
           test_equal "Wrong \"installed\" output from setup-kitten-2" \
-            "${{ steps.setup-kitten-2.outputs.installed }}" \
+            "${STEP_SETUP_KITTEN_2_OUTPUT_INSTALLED}" \
             "${{ matrix.force }}"
