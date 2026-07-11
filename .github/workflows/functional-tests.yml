@@ -36,6 +36,7 @@ jobs:
         with:
           persist-credentials: "false"
       - name: Setup Kitten
+        id: setup-kitten
         uses: ./
       - name: Test action completion
         env:
