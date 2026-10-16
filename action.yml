@@ -42,7 +42,7 @@ runs:
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         repository: "fabasoad/kitten"
-        ref: "8227d3cccb78b8ad8413b859d4697be0d7bec068" # pragma: allowlist secret
+        ref: "462d1d354d8ff5ebd518e4a69fb992e9093ead22" # pragma: allowlist secret
         # repository: "evincarofautumn/kitten"
         # ref: "2bbc264d7f05c4a7d7b35d06773d1ab2f0623193" # pragma: allowlist secret
         path: ${{ steps.info.outputs.bin-dir }}
