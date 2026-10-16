@@ -22,14 +22,14 @@ defaults:
 jobs:
   run-script:
     name: Run script
-    runs-on: ${{ matrix.os }}-latest
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 40
     permissions:
       contents: read
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu", "macos", "windows"]
+        os: ["ubuntu-latest", "macos-15", "windows-latest"]
     steps:
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
